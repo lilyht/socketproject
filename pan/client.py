@@ -46,12 +46,11 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w2.show()  # 注册界面弹出
         self.w2.confirmSignal.connect(self.recvRegi)  # 添加槽
 
-    # 类外接收注册界面传来的注册名和注册密码
+    # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
-
         self.regiUser = text1
         self.regiPassword = text2
-        self.check2(self.regiUser, self.regiPassword)
+        self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
 
     # 向服务器发送登录输入的账号密码，检查是否正确，如果正确则跳转界面，否则提示错误
     def check(self):
@@ -73,19 +72,28 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             reply = reply.decode(encoding='utf-8')
             print(reply)
             if reply == "1":
-                print("隐藏登录窗口，并跳转到云盘主界面")
+                logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
             elif reply == "0":
-                print("提示密码错误")
+                logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
             else:
-                print("提示用户不存在")
+                logInfo = QMessageBox.information(self, "登录反馈", "用户不存在！")
 
     # 向服务器发送注册输入的账号密码，检查是否已经有注册的了，如果没有，把账号密码添加进数据库。
-    def check2(self, regiUsertext, regiPasswodtext):
-        print(regiUsertext, regiPasswodtext)
-        self.client.send(regiUsertext.encode("UTF-8"))
-        print(self.client.recv(1024))
+    def check2(self, regiUsertext, regiPasswordtext):
 
-        regiInfo = QMessageBox.information(self, "注册反馈", "注册成功，请返回登录")
+        regiuserinfo = 'regi' + ' ' + regiUsertext + ' ' + regiPasswordtext
+        print(regiuserinfo)
+        print("客户端开始发送注册指令和用户名密码")
+        self.client.send(regiuserinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
+        reply = self.client.recv(1024)  # 接收服务器的回复
+        reply = reply.decode(encoding='utf-8')
+        print(reply)
+        if reply == "1":
+            regiInfo = QMessageBox.information(self, "注册反馈", "注册成功！")
+        elif reply == "0":
+            regiInfo = QMessageBox.information(self, "注册反馈", "用户名已存在！")
+        else:
+            regiInfo = QMessageBox.information(self, "注册反馈", "出现未知错误！")
 
 
 if __name__ == '__main__':
