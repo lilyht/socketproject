@@ -13,15 +13,22 @@ buf = 2048
 def dealConn(conn, addr):
     # 获取客户发送的指令
     print("开始处理连接")
-    cmd = conn.recv(buf)
-    cmd = cmd.decode(encoding='utf-8')
+    data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
+    print(data.decode(encoding='utf-8'))
+    datastr = data.decode(encoding='utf-8')  # type: 'str'
+    dstr = datastr.split()
+    cmd = dstr[0]
+    username = dstr[1]
+    psw = dstr[2]
+
     print("接收的指令是：", cmd)
     if cmd == "regi":
         dealRegi(conn, addr)
     if cmd == "log":
         print("接收到了登录指令")
-        user = dealLogin(conn, addr)
-        # if user != "":
+        user = dealLogin(conn, addr, username, psw)
+        if user != "":
+            print("登录成功！")
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
@@ -59,14 +66,9 @@ def dealTr(conn, addr, user):
     return None
 
 
-def dealLogin(conn, addr):
+def dealLogin(conn, addr, username, psw):
 
-    data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
-    print(data.decode(encoding='utf-8'))
-    datastr = data.decode(encoding='utf-8')  # type: 'str'
-    dstr = datastr.split()
-    username = dstr[0]
-    psw = dstr[1]
+    print(username, psw)
     # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "yrp990716", "pandb", charset='utf8' )
     # 使用cursor()方法获取操作游标
@@ -76,21 +78,21 @@ def dealLogin(conn, addr):
     except:
         print("Error: unable to use database!")
     # 使用execute方法执行SQL语句，查询密码是否匹配
-    sql = "SELECT password FROM USER WHERE user = %s" % username
+    sql = "SELECT password FROM USER WHERE user = '%s'" % username
     try:
         cursor.execute(sql)
         res = cursor.fetchone()
         print("password in db:{}".format(res[0]))
-        print("输入的psw:{}".format(psw))
+        # print("输入的psw:{}".format(psw))
 
         if res[0] == psw:
-            conn.send("1")
+            conn.send("1".encode("UTF-8"))
             return username
         else:
-            conn.send("0")
+            conn.send("0".encode("UTF-8"))
             return ""
     except:
-        conn.send("-1")
+        conn.send("-1".encode("UTF-8"))
     return ""
 
 

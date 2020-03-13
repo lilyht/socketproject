@@ -57,7 +57,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def check(self):
         self.user = self.userLine.text()
         self.password = self.passwordLine.text()
-        userinfo = self.user + ' ' + self.password
+        userinfo = 'log' + ' ' + self.user + ' ' + self.password
         print(userinfo)
         if self.user == "":
             print("用户名不能为空！")
@@ -65,13 +65,13 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             print("密码不能为空！")
         else:
 
-            print("客户端开始发送登录指令")
-            command = "log"
-            self.client.send(command.encode("UTF-8"))  # 客户端发送登录指令
-            self.client.send(userinfo.encode("UTF-8"))  # 客户端传递用户名密码
+            print("客户端开始发送登录指令和用户名密码")
+
+            self.client.send(userinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
 
             reply = self.client.recv(1024)  # 接收服务器的回复
             reply = reply.decode(encoding='utf-8')
+            print(reply)
             if reply == "1":
                 print("隐藏登录窗口，并跳转到云盘主界面")
             elif reply == "0":
