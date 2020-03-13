@@ -35,7 +35,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.client = socket(AF_INET, SOCK_STREAM)
         self.client.connect((serverIP, serverPort))
 
-        # 子窗口
+        # 子窗口对象
         self.w2 = regiWindow()
         self.w3 = panWindow()
 
@@ -47,7 +47,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     # 点击注册按钮时的响应
     def regi(self):
         self.w2.show()  # 注册界面弹出
-        self.w2.confirmSignal.connect(self.recvRegi)  # 添加槽
+        self.w2.confirmSignal.connect(self.recvRegi)  # 获取登陆界面的提交信息
 
     # 登录成功后的响应
     def pan(self):
@@ -61,8 +61,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
 
     def recvPanExit(self):
-        self.client.close()
-        self.close()
+        self.client.close()  # 断开连接
+        self.close()  # 退出程序
 
     # 向服务器发送登录输入的账号密码，检查是否正确，如果正确则跳转界面，否则提示错误
     def check(self):
@@ -85,8 +85,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             print(reply)
             if reply == "1":
                 logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
-                self.pan()
-                self.hide()
+                self.pan()  # 调用pan界面响应
+                self.hide()  # 登录界面隐藏，但仍然能传递参数
 
             elif reply == "0":
                 logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
@@ -114,5 +114,4 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
 if __name__ == '__main__':
     main()
-
 
