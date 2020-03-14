@@ -6,6 +6,7 @@ from PyQt5.QtCore import pyqtSignal
 from regiControl import regiWindow
 import gol
 from socket import *
+import time
 
 serverIP = '127.0.0.1'
 serverPort = 12000
@@ -32,6 +33,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.regiUser = ""
         self.regiPassword = ""
         self.client = socket(AF_INET, SOCK_STREAM)
+        self.client.settimeout(10) # 设置连接超时
+        # time.sleep(2)
+        # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
+        self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1) # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
 
         self.w2 = regiWindow()
