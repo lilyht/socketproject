@@ -107,11 +107,7 @@ def dealLogin(conn, addr, username, psw):
 
     # print(username, psw)
     # 打开数据库连接
-<<<<<<< HEAD
-    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8' )
-=======
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
->>>>>>> c00eb1ef9bbc3efa3a0ee3a8b511755d9292a36d
     # 使用cursor()方法获取操作游标
     cursor = db.cursor()
     try:
