@@ -114,7 +114,7 @@ def dealTr(conn, addr, user):
 
 def dealLogin(conn, addr, username, psw):
 
-    # print(username, psw)
+    print(username, psw)
     # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     # 使用cursor()方法获取操作游标
@@ -126,22 +126,23 @@ def dealLogin(conn, addr, username, psw):
 
     # 使用execute方法执行SQL语句，查询密码是否匹配
     sql = "SELECT password FROM USER WHERE user = '%s'" % username
-    try:
-        cursor.execute(sql)
-        res = cursor.fetchone()
-        # print("password in db:{}".format(res[0]))
-        # print("输入的psw:{}".format(psw))
 
+    cursor.execute(sql)
+    res = cursor.fetchone()
+
+    if res is None:
+        conn.send("-1".encode("UTF-8"))
+        return ""
+    else:
         if res[0] == psw:
             conn.send("1".encode("UTF-8"))
             return username
         else:
+            # print("password in db:{}".format(res[0]))
+            # print("输入的psw:{}".format(psw))
             conn.send("0".encode("UTF-8"))
             return ""
-    except ValueError as e:
-        print("--->", e)
-        conn.send("-1".encode("UTF-8"))
-    return ""
+
 
 # x心跳检测保留函数
 def checkConnection(conn, addr):
@@ -150,19 +151,21 @@ def checkConnection(conn, addr):
     starttime = datetime.datetime.now()
     # print('client addr',addr)
     client_msg=conn.recv(1024)
-    # print('client msg: %s' %(str(client_msg,'utf-8')))
-    print("msg from client {} : {}".format(addr, str(client_msg,'utf-8')))
-    keep_alive(conn, addr)
+    if client_msg.decode(encoding='utf-8')!= "":
+        # print('client msg: %s' %(str(client_msg,'utf-8')))
+        print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
+        keep_alive(conn, addr)
+
 
 def keep_alive(conn, addr):
     global endtime
     a = 1
-    while a==1:
+    while a == 1:
         try:
             serverSocket.settimeout(5)
             print('---------------------------------')
             client_msg = conn.recv(1024) # 客户端发送过来的消息
-            print("msg from client {} : {}".format(addr, str(client_msg,'utf-8')))
+            print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
         except:
             a = 2
             endtime = datetime.datetime.now()
@@ -171,6 +174,7 @@ def keep_alive(conn, addr):
     '''
     处理断开
     '''
+
 
 def main():
     print("The server in ready to receive.")
@@ -181,6 +185,7 @@ def main():
 
         thread = threading.Thread(target=dealConn, args=(conn, addr))
         thread.start()
+
 
 if __name__ == '__main__':
     main()
