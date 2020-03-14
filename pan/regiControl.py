@@ -18,11 +18,11 @@ class regiWindow(QMainWindow, Ui_regiWindow):
         user = self.userLine.text()
         password = self.passwordLine.text()
         reenter = self.reenterLine.text()
-        if user is "":
+        if user == "":
             print("用户名不能为空！")
-        elif password is "":
+        elif password == "":
             print("密码不能为空！")
-        elif reenter is "":
+        elif reenter == "":
             print("确认密码不能为空！")
         else:
             if password != reenter:

@@ -4,7 +4,7 @@
 import MySQLdb
 
 # 打开数据库连接
-db = MySQLdb.connect("localhost", "root", "yrp990716", "pandb", charset='utf8' )
+db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8' )
 
 # 使用cursor()方法获取操作游标 
 cursor = db.cursor()
@@ -17,6 +17,17 @@ data = cursor.fetchone()
 
 print("Database version :")
 print(data)
+
+username = 'test1'
+sql = "SELECT password FROM USER WHERE user = '%s'" % username
+try:
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    print("password in db:{}".format(res[0]))
+
+except:
+    print("error")
+
 
 # 关闭数据库连接
 db.close()
