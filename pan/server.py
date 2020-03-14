@@ -1,13 +1,20 @@
 from socket import *
 import MySQLdb
 import threading
+import datetime
 # -*- coding: UTF-8 -*-
 
 serverIP = '127.0.0.1'
 serverPort = 12000
 maxN = 5  # 最大连接数
 buf = 2048
+starttime = None
+endtime = None
 
+serverSocket = socket(AF_INET, SOCK_STREAM)
+serverSocket.bind((serverIP, serverPort))
+# 最大连接数
+serverSocket.listen(maxN)
 
 # 收发数据
 def dealConn(conn, addr):
@@ -29,6 +36,8 @@ def dealConn(conn, addr):
                 user = dealLogin(conn, addr, username, psw)
                 if user != "":
                     print("登录成功！")
+                    recordConnThread = threading.Thread(target=checkConnection, args=(conn, addr))
+                    recordConnThread.start()
                     break
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
@@ -134,24 +143,37 @@ def dealLogin(conn, addr, username, psw):
         conn.send("-1".encode("UTF-8"))
     return ""
 
-
 # x心跳检测保留函数
-def checkConnection(conn, address):
-    return ""
+def checkConnection(conn, addr):
+    global starttime
+    serverSocket.settimeout(None)
+    starttime = datetime.datetime.now()
+    # print('client addr',addr)
+    client_msg=conn.recv(1024)
+    # print('client msg: %s' %(str(client_msg,'utf-8')))
+    print("msg from client {} : {}".format(addr, str(client_msg,'utf-8')))
+    keep_alive(conn, addr)
 
-
-def keep_alive():
-    return ""
+def keep_alive(conn, addr):
+    global endtime
+    a = 1
+    while a==1:
+        try:
+            serverSocket.settimeout(5)
+            print('---------------------------------')
+            client_msg = conn.recv(1024) # 客户端发送过来的消息
+            print("msg from client {} : {}".format(addr, str(client_msg,'utf-8')))
+        except:
+            a = 2
+            endtime = datetime.datetime.now()
+    # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
+    print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+    '''
+    处理断开
+    '''
 
 def main():
-
-    serverSocket = socket(AF_INET, SOCK_STREAM)
-    serverSocket.bind((serverIP, serverPort))
-    # 最大连接数
-    serverSocket.listen(maxN)
-
     print("The server in ready to receive.")
-
     while True:
         # 接收到客户连接请求后，建立新的TCP连接套接字
         conn, addr = serverSocket.accept()
@@ -159,7 +181,6 @@ def main():
 
         thread = threading.Thread(target=dealConn, args=(conn, addr))
         thread.start()
-
 
 if __name__ == '__main__':
     main()

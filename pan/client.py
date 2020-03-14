@@ -8,10 +8,10 @@ from regiControl import regiWindow
 from panControl import panWindow
 from socket import *
 import time
+import threading
 
 serverIP = '127.0.0.1'
 serverPort = 12000
-
 
 def main():
     # 程序的开始，所有的窗口都由登陆界面（w1）衍生
@@ -48,6 +48,15 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.loginButton.clicked.connect(self.check)
         # 点击注册按钮时，弹出注册界面
         self.regiButton.clicked.connect(self.regi)
+    
+    # 发送心跳包
+    def sendHeartbeat(self):
+        a = 0
+        while True:
+            time.sleep(4)
+            a += 1
+            keepconn = "已连接"+str(a*4)+"秒"
+            self.client.send(bytes(keepconn,'UTF-8')) # 向服务端发送消息
 
     # 点击注册按钮时的响应
     def regi(self):
@@ -56,7 +65,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
     # 登录成功后的响应
     def pan(self):
+        heart = threading.Thread(target=self.sendHeartbeat, args=())
         self.w3.show()  # 网盘界面弹出
+        heart.start()
+
         self.w3.exitSignal.connect(self.recvPanExit)  # 接收到网盘界面的退出
 
     # 接收注册界面传来的注册名和注册密码
