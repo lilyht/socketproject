@@ -151,7 +151,7 @@ def checkConnection(conn, addr):
     starttime = datetime.datetime.now()
     # print('client addr',addr)
     client_msg=conn.recv(1024)
-    if client_msg.decode(encoding='utf-8')!= "":
+    if client_msg.decode(encoding='utf-8') !=  "":
         # print('client msg: %s' %(str(client_msg,'utf-8')))
         print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
         keep_alive(conn, addr)
@@ -165,7 +165,8 @@ def keep_alive(conn, addr):
             serverSocket.settimeout(5)
             print('---------------------------------')
             client_msg = conn.recv(1024) # 客户端发送过来的消息
-            print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
+            if client_msg.decode(encoding='utf-8') != "":
+                print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
         except:
             a = 2
             endtime = datetime.datetime.now()
