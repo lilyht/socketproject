@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>210</x>
-      <y>360</y>
+      <y>330</y>
       <width>411</width>
       <height>102</height>
      </rect>
@@ -29,7 +29,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -53,7 +53,7 @@ loginButton hover{
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -74,7 +74,7 @@ font-weight: bold;
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>30</height>
+         <height>40</height>
         </size>
        </property>
        <property name="styleSheet">
@@ -95,19 +95,26 @@ font-weight: bold;
    <widget class="QLabel" name="title">
     <property name="geometry">
      <rect>
-      <x>270</x>
-      <y>50</y>
-      <width>291</width>
+      <x>220</x>
+      <y>60</y>
+      <width>391</width>
       <height>51</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>20</pointsize>
+      <family>Microsoft JhengHei UI Light</family>
+      <pointsize>25</pointsize>
+      <weight>3</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">font: 25 25pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+    </property>
     <property name="text">
-     <string>丑陋的登录页面</string>
+     <string>个人云盘登录页面</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -117,36 +124,50 @@ font-weight: bold;
     <property name="geometry">
      <rect>
       <x>220</x>
-      <y>130</y>
+      <y>150</y>
       <width>391</width>
       <height>151</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="1" column="0">
+     <item row="1" column="0" alignment="Qt::AlignLeft">
       <widget class="QLabel" name="paswordLabel">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Microsoft JhengHei UI Light</family>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 15pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+       </property>
        <property name="text">
-        <string>password</string>
+        <string>Password</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
-     <item row="0" column="0">
+     <item row="0" column="0" alignment="Qt::AlignLeft">
       <widget class="QLabel" name="userLabel">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Microsoft JhengHei UI Light</family>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 15pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+       </property>
        <property name="text">
-        <string>user</string>
+        <string>User Name</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -156,18 +177,24 @@ font-weight: bold;
      <item row="1" column="1">
       <widget class="QLineEdit" name="passwordLine">
        <property name="styleSheet">
-        <string notr="true">font: 25 10pt &quot;微软雅黑 Light&quot;;
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
 border-style: none;
 border-bottom: 1px solid rgb(135, 135, 135);
 background-color: rgba(255,255,255,0)
 </string>
+       </property>
+       <property name="frame">
+        <bool>true</bool>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
       <widget class="QLineEdit" name="userLine">
        <property name="styleSheet">
-        <string notr="true">font: 25 10pt &quot;微软雅黑 Light&quot;;
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
 border-style: none;
 border-bottom: 1px solid rgb(135, 135, 135);
 background-color: rgba(255,255,255,0)

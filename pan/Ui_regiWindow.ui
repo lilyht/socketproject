@@ -23,19 +23,26 @@
    <widget class="QLabel" name="regiLabel">
     <property name="geometry">
      <rect>
-      <x>190</x>
-      <y>30</y>
-      <width>161</width>
-      <height>31</height>
+      <x>150</x>
+      <y>20</y>
+      <width>241</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="font">
      <font>
-      <pointsize>20</pointsize>
+      <family>Microsoft JhengHei UI Light</family>
+      <pointsize>25</pointsize>
+      <weight>3</weight>
+      <italic>false</italic>
+      <bold>false</bold>
      </font>
     </property>
+    <property name="styleSheet">
+     <string notr="true">font: 25 25pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+    </property>
     <property name="text">
-     <string>很丑的注册界面</string>
+     <string>注册界面</string>
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
@@ -45,47 +52,70 @@
     <property name="geometry">
      <rect>
       <x>160</x>
-      <y>260</y>
+      <y>270</y>
       <width>100</width>
       <height>50</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: none;
+background-color: rgb(1, 90, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;
+</string>
+    </property>
     <property name="text">
-     <string>确认</string>
+     <string>OK</string>
     </property>
    </widget>
    <widget class="QPushButton" name="exitButton">
     <property name="geometry">
      <rect>
       <x>290</x>
-      <y>260</y>
+      <y>270</y>
       <width>100</width>
       <height>50</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: none;
+background-color: rgb(53, 148, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;
+</string>
+    </property>
     <property name="text">
-     <string>返回</string>
+     <string>BACK</string>
     </property>
    </widget>
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>90</y>
-      <width>301</width>
+      <x>100</x>
+      <y>100</y>
+      <width>341</width>
       <height>131</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="0">
+     <item row="0" column="0" alignment="Qt::AlignLeft">
       <widget class="QLabel" name="userLabel">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Microsoft JhengHei UI Light</family>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 15pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+       </property>
        <property name="text">
-        <string>user:</string>
+        <string>User Name</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -93,32 +123,54 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="userLine"/>
+      <widget class="QLineEdit" name="userLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+      </widget>
      </item>
-     <item row="1" column="0">
+     <item row="1" column="0" alignment="Qt::AlignLeft">
       <widget class="QLabel" name="passwordLabel">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Microsoft JhengHei UI Light</family>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 15pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+       </property>
        <property name="text">
-        <string>password:</string>
+        <string>Password</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="2" column="0" alignment="Qt::AlignLeft">
       <widget class="QLabel" name="reenterLabel">
        <property name="font">
         <font>
-         <pointsize>16</pointsize>
+         <family>Microsoft JhengHei UI Light</family>
+         <pointsize>15</pointsize>
+         <weight>50</weight>
+         <italic>false</italic>
+         <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true">font: 15pt &quot;Microsoft JhengHei UI Light&quot;;</string>
+       </property>
        <property name="text">
-        <string>re-enter:</string>
+        <string>Re-enter</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -126,10 +178,32 @@
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QLineEdit" name="reenterLine"/>
+      <widget class="QLineEdit" name="reenterLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="passwordLine"/>
+      <widget class="QLineEdit" name="passwordLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -140,7 +214,7 @@
      <x>0</x>
      <y>0</y>
      <width>535</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>

@@ -17,13 +17,13 @@ class Ui_loginWindow(object):
         self.centralwidget = QtWidgets.QWidget(loginWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(210, 360, 411, 102))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(210, 330, 411, 102))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.loginButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.loginButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.loginButton.setMinimumSize(QtCore.QSize(0, 40))
         self.loginButton.setStyleSheet("border-style: none;\n"
 "font: 10pt \"Microsoft YaHei UI\";\n"
 "background-color: rgb(1, 90, 255);\n"
@@ -36,7 +36,7 @@ class Ui_loginWindow(object):
         self.loginButton.setObjectName("loginButton")
         self.horizontalLayout.addWidget(self.loginButton)
         self.regiButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.regiButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.regiButton.setMinimumSize(QtCore.QSize(0, 40))
         self.regiButton.setStyleSheet("border-style: none;\n"
 "background-color: rgb(1, 90, 255);\n"
 "font: 10pt \"Microsoft YaHei UI\";\n"
@@ -46,7 +46,7 @@ class Ui_loginWindow(object):
         self.regiButton.setObjectName("regiButton")
         self.horizontalLayout.addWidget(self.regiButton)
         self.exitButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
-        self.exitButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.exitButton.setMinimumSize(QtCore.QSize(0, 40))
         self.exitButton.setStyleSheet("border-style: none;\n"
 "background-color: rgb(53, 148, 255);\n"
 "font: 10pt \"Microsoft YaHei UI\";\n"
@@ -56,42 +56,59 @@ class Ui_loginWindow(object):
         self.exitButton.setObjectName("exitButton")
         self.horizontalLayout.addWidget(self.exitButton)
         self.title = QtWidgets.QLabel(self.centralwidget)
-        self.title.setGeometry(QtCore.QRect(270, 50, 291, 51))
+        self.title.setGeometry(QtCore.QRect(220, 60, 391, 51))
         font = QtGui.QFont()
-        font.setPointSize(20)
+        font.setFamily("Microsoft JhengHei UI Light")
+        font.setPointSize(25)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(3)
         self.title.setFont(font)
+        self.title.setStyleSheet("font: 25 25pt \"Microsoft JhengHei UI Light\";")
         self.title.setAlignment(QtCore.Qt.AlignCenter)
         self.title.setObjectName("title")
         self.gridLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.gridLayoutWidget.setGeometry(QtCore.QRect(220, 130, 391, 151))
+        self.gridLayoutWidget.setGeometry(QtCore.QRect(220, 150, 391, 151))
         self.gridLayoutWidget.setObjectName("gridLayoutWidget")
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
         self.paswordLabel = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setFamily("Microsoft JhengHei UI Light")
+        font.setPointSize(15)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
         self.paswordLabel.setFont(font)
+        self.paswordLabel.setStyleSheet("font: 15pt \"Microsoft JhengHei UI Light\";")
         self.paswordLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.paswordLabel.setObjectName("paswordLabel")
-        self.gridLayout.addWidget(self.paswordLabel, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.paswordLabel, 1, 0, 1, 1, QtCore.Qt.AlignLeft)
         self.userLabel = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
-        font.setPointSize(16)
+        font.setFamily("Microsoft JhengHei UI Light")
+        font.setPointSize(15)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
         self.userLabel.setFont(font)
+        self.userLabel.setStyleSheet("font: 15pt \"Microsoft JhengHei UI Light\";")
         self.userLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.userLabel.setObjectName("userLabel")
-        self.gridLayout.addWidget(self.userLabel, 0, 0, 1, 1)
+        self.gridLayout.addWidget(self.userLabel, 0, 0, 1, 1, QtCore.Qt.AlignLeft)
         self.passwordLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.passwordLine.setStyleSheet("font: 25 10pt \"微软雅黑 Light\";\n"
+        self.passwordLine.setStyleSheet("font: 25 12pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border-bottom: 1px solid rgb(135, 135, 135);\n"
 "background-color: rgba(255,255,255,0)\n"
 "")
+        self.passwordLine.setFrame(True)
+        self.passwordLine.setEchoMode(QtWidgets.QLineEdit.Password)
         self.passwordLine.setObjectName("passwordLine")
         self.gridLayout.addWidget(self.passwordLine, 1, 1, 1, 1)
         self.userLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.userLine.setStyleSheet("font: 25 10pt \"微软雅黑 Light\";\n"
+        self.userLine.setStyleSheet("font: 25 12pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border-bottom: 1px solid rgb(135, 135, 135);\n"
 "background-color: rgba(255,255,255,0)\n"
@@ -117,6 +134,6 @@ class Ui_loginWindow(object):
         self.loginButton.setText(_translate("loginWindow", "LOGIN"))
         self.regiButton.setText(_translate("loginWindow", "SIGN UP"))
         self.exitButton.setText(_translate("loginWindow", "SIGN OUT"))
-        self.title.setText(_translate("loginWindow", "丑陋的登录页面"))
-        self.paswordLabel.setText(_translate("loginWindow", "password"))
-        self.userLabel.setText(_translate("loginWindow", "user"))
+        self.title.setText(_translate("loginWindow", "个人云盘登录页面"))
+        self.paswordLabel.setText(_translate("loginWindow", "Password"))
+        self.userLabel.setText(_translate("loginWindow", "User Name"))
