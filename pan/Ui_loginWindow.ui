@@ -20,28 +20,73 @@
       <x>210</x>
       <y>360</y>
       <width>411</width>
-      <height>61</height>
+      <height>102</height>
      </rect>
     </property>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="loginButton">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-style: none;
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+background-color: rgb(1, 90, 255);
+color: white;
+font-weight: bold;
+loginButton hover{
+	background-color: rgb(53, 148, 255)
+}
+</string>
+       </property>
        <property name="text">
-        <string>登录</string>
+        <string>LOGIN</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="regiButton">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-style: none;
+background-color: rgb(1, 90, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;
+</string>
+       </property>
        <property name="text">
-        <string>注册</string>
+        <string>SIGN UP</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="exitButton">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>30</height>
+        </size>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-style: none;
+background-color: rgb(53, 148, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;
+</string>
+       </property>
        <property name="text">
-        <string>退出</string>
+        <string>SIGN OUT</string>
        </property>
       </widget>
      </item>
@@ -78,8 +123,20 @@
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="userLine"/>
+     <item row="1" column="0">
+      <widget class="QLabel" name="paswordLabel">
+       <property name="font">
+        <font>
+         <pointsize>16</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>password</string>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="userLabel">
@@ -89,22 +146,7 @@
         </font>
        </property>
        <property name="text">
-        <string>user:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="paswordLabel">
-       <property name="font">
-        <font>
-         <pointsize>16</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>password:</string>
+        <string>user</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignCenter</set>
@@ -112,7 +154,26 @@
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="passwordLine"/>
+      <widget class="QLineEdit" name="passwordLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 10pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="userLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 10pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
@@ -123,7 +184,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>

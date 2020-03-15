@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Ui_loginWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -17,18 +17,42 @@ class Ui_loginWindow(object):
         self.centralwidget = QtWidgets.QWidget(loginWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
-        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(210, 360, 411, 61))
+        self.horizontalLayoutWidget.setGeometry(QtCore.QRect(210, 360, 411, 102))
         self.horizontalLayoutWidget.setObjectName("horizontalLayoutWidget")
         self.horizontalLayout = QtWidgets.QHBoxLayout(self.horizontalLayoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
         self.loginButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.loginButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.loginButton.setStyleSheet("border-style: none;\n"
+"font: 10pt \"Microsoft YaHei UI\";\n"
+"background-color: rgb(1, 90, 255);\n"
+"color: white;\n"
+"font-weight: bold;\n"
+"loginButton hover{\n"
+"    background-color: rgb(53, 148, 255)\n"
+"}\n"
+"")
         self.loginButton.setObjectName("loginButton")
         self.horizontalLayout.addWidget(self.loginButton)
         self.regiButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.regiButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.regiButton.setStyleSheet("border-style: none;\n"
+"background-color: rgb(1, 90, 255);\n"
+"font: 10pt \"Microsoft YaHei UI\";\n"
+"color: white;\n"
+"font-weight: bold;\n"
+"")
         self.regiButton.setObjectName("regiButton")
         self.horizontalLayout.addWidget(self.regiButton)
         self.exitButton = QtWidgets.QPushButton(self.horizontalLayoutWidget)
+        self.exitButton.setMinimumSize(QtCore.QSize(0, 30))
+        self.exitButton.setStyleSheet("border-style: none;\n"
+"background-color: rgb(53, 148, 255);\n"
+"font: 10pt \"Microsoft YaHei UI\";\n"
+"color: white;\n"
+"font-weight: bold;\n"
+"")
         self.exitButton.setObjectName("exitButton")
         self.horizontalLayout.addWidget(self.exitButton)
         self.title = QtWidgets.QLabel(self.centralwidget)
@@ -44,16 +68,6 @@ class Ui_loginWindow(object):
         self.gridLayout = QtWidgets.QGridLayout(self.gridLayoutWidget)
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
         self.gridLayout.setObjectName("gridLayout")
-        self.userLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.userLine.setObjectName("userLine")
-        self.gridLayout.addWidget(self.userLine, 0, 1, 1, 1)
-        self.userLabel = QtWidgets.QLabel(self.gridLayoutWidget)
-        font = QtGui.QFont()
-        font.setPointSize(16)
-        self.userLabel.setFont(font)
-        self.userLabel.setAlignment(QtCore.Qt.AlignCenter)
-        self.userLabel.setObjectName("userLabel")
-        self.gridLayout.addWidget(self.userLabel, 0, 0, 1, 1)
         self.paswordLabel = QtWidgets.QLabel(self.gridLayoutWidget)
         font = QtGui.QFont()
         font.setPointSize(16)
@@ -61,12 +75,32 @@ class Ui_loginWindow(object):
         self.paswordLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.paswordLabel.setObjectName("paswordLabel")
         self.gridLayout.addWidget(self.paswordLabel, 1, 0, 1, 1)
+        self.userLabel = QtWidgets.QLabel(self.gridLayoutWidget)
+        font = QtGui.QFont()
+        font.setPointSize(16)
+        self.userLabel.setFont(font)
+        self.userLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.userLabel.setObjectName("userLabel")
+        self.gridLayout.addWidget(self.userLabel, 0, 0, 1, 1)
         self.passwordLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.passwordLine.setStyleSheet("font: 25 10pt \"微软雅黑 Light\";\n"
+"border-style: none;\n"
+"border-bottom: 1px solid rgb(135, 135, 135);\n"
+"background-color: rgba(255,255,255,0)\n"
+"")
         self.passwordLine.setObjectName("passwordLine")
         self.gridLayout.addWidget(self.passwordLine, 1, 1, 1, 1)
+        self.userLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.userLine.setStyleSheet("font: 25 10pt \"微软雅黑 Light\";\n"
+"border-style: none;\n"
+"border-bottom: 1px solid rgb(135, 135, 135);\n"
+"background-color: rgba(255,255,255,0)\n"
+"")
+        self.userLine.setObjectName("userLine")
+        self.gridLayout.addWidget(self.userLine, 0, 1, 1, 1)
         loginWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(loginWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 17))
         self.menubar.setObjectName("menubar")
         loginWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(loginWindow)
@@ -80,9 +114,9 @@ class Ui_loginWindow(object):
     def retranslateUi(self, loginWindow):
         _translate = QtCore.QCoreApplication.translate
         loginWindow.setWindowTitle(_translate("loginWindow", "MainWindow"))
-        self.loginButton.setText(_translate("loginWindow", "登录"))
-        self.regiButton.setText(_translate("loginWindow", "注册"))
-        self.exitButton.setText(_translate("loginWindow", "退出"))
+        self.loginButton.setText(_translate("loginWindow", "LOGIN"))
+        self.regiButton.setText(_translate("loginWindow", "SIGN UP"))
+        self.exitButton.setText(_translate("loginWindow", "SIGN OUT"))
         self.title.setText(_translate("loginWindow", "丑陋的登录页面"))
-        self.userLabel.setText(_translate("loginWindow", "user:"))
-        self.paswordLabel.setText(_translate("loginWindow", "password:"))
+        self.paswordLabel.setText(_translate("loginWindow", "password"))
+        self.userLabel.setText(_translate("loginWindow", "user"))
