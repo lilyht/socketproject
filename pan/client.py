@@ -40,6 +40,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         # time.sleep(2)
         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
         # self.client.settimeout(100)
+        self.clientIP = ""
+        self.clientPort = ""
         self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
 
@@ -51,7 +53,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.loginButton.clicked.connect(self.check)
         # 点击注册按钮时，弹出注册界面
         self.regiButton.clicked.connect(self.regi)
-    
+        # 输入密码按回车键也是跳转到检验函数
+        self.passwordLine.returnPressed.connect(self.check)
+
     # 发送心跳包
     def sendHeartbeat(self):
         a = 0
@@ -67,9 +71,15 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w2.confirmSignal.connect(self.recvRegi)  # 获取登陆界面的提交信息
 
     # 登录成功后的响应
-    def pan(self):
+    def pan(self, user, clientIP, clientPort):
         heart = threading.Thread(target=self.sendHeartbeat, args=())
         self.w3.show()  # 网盘界面弹出
+        self.w3.user = user
+        self.w3.clientIP = clientIP
+        self.w3.clientPort = clientPort
+        self.w3.usernameLine.setText(user)
+        self.w3.ipLine.setText(clientIP)
+        self.w3.portLine.setText(clientPort)
         heart.start()
 
         self.w3.exitSignal.connect(self.recvPanExit)  # 接收到网盘界面的退出
@@ -103,15 +113,17 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             reply = self.client.recv(1024)  # 接收服务器的回复
             reply = reply.decode(encoding='utf-8')
             print(reply)
-            if reply == "1":
-                logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
-                self.pan()  # 调用pan界面响应
-                self.hide()  # 登录界面隐藏，但仍然能传递参数
-
-            elif reply == "0":
+            if reply == "0":
                 logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
-            else:
+            elif reply == "-1":
                 logInfo = QMessageBox.information(self, "登录反馈", "用户不存在！")
+            else:
+                reply = reply.split()
+                self.clientIP = reply[1]
+                self.clientPort = reply[2]
+                logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
+                self.pan(self.user, self.clientIP, self.clientPort)  # 调用pan界面响应
+                self.hide()  # 登录界面隐藏，但仍然能传递参数
 
     # 向服务器发送注册输入的账号密码，检查是否已经有注册的了，如果没有，把账号密码添加进数据库。
     def check2(self, regiUsertext, regiPasswordtext):

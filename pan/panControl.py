@@ -11,8 +11,13 @@ class panWindow(QMainWindow, Ui_panWindow):
     def __init__(self, parent=None):
         super(panWindow, self).__init__(parent)
         self.setupUi(self)
+
+        self.user = ""
+        self.clientIP = ""
+        self.clientPort = ""
         self.exitButton.clicked.connect(self.shutdown)
         self.declareButton.clicked.connect(self.getLocalPath)
+
 
     # 点击资源声明后打开本地文件夹并获取路径
     def getLocalPath(self):

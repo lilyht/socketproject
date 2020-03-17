@@ -5,7 +5,7 @@ import datetime
 # -*- coding: UTF-8 -*-
 
 # serverIP = '127.0.0.1'
-serverIP = "0.0.0.0"
+serverIP = '0.0.0.0'
 serverPort = 12000
 
 
@@ -118,7 +118,8 @@ def dealTr(conn, addr, user):
 
 def dealLogin(conn, addr, username, psw):
 
-    print(username, psw)
+    # print(username, psw)
+
     # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     # 使用cursor()方法获取操作游标
@@ -139,7 +140,8 @@ def dealLogin(conn, addr, username, psw):
         return ""
     else:
         if res[0] == psw:
-            conn.send("1".encode("UTF-8"))
+            reply = "1" + " " + addr[0] + " " + str(addr[1])
+            conn.send(reply.encode("UTF-8"))
             return username
         else:
             # print("password in db:{}".format(res[0]))

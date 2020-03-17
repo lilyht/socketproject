@@ -13,6 +13,7 @@ class regiWindow(QMainWindow, Ui_regiWindow):
         self.setupUi(self)
         self.confirmButton.clicked.connect(self.sendAndCheck)  # 确认按钮点击时，将注册名和注册密码传到client，并交给server检验
         self.exitButton.clicked.connect(self.close)
+        self.reenterLine.returnPressed.connect(self.sendAndCheck)  # 输入确认密码后回车也是提交检验
 
     def sendAndCheck(self):
         user = self.userLine.text()
