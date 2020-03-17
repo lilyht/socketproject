@@ -4,8 +4,11 @@ import threading
 import datetime
 # -*- coding: UTF-8 -*-
 
-serverIP = '127.0.0.1'
+# serverIP = '127.0.0.1'
+serverIP = "0.0.0.0"
 serverPort = 12000
+
+
 maxN = 5  # 最大连接数
 buf = 2048
 starttime = None
@@ -15,6 +18,7 @@ serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind((serverIP, serverPort))
 # 最大连接数
 serverSocket.listen(maxN)
+
 
 # 收发数据
 def dealConn(conn, addr):
@@ -163,7 +167,7 @@ def keep_alive(conn, addr):
     while a == 1:
         try:
             serverSocket.settimeout(5)
-            print('---------------------------------')
+            # print('---------------------------------')
             client_msg = conn.recv(1024) # 客户端发送过来的消息
             if client_msg.decode(encoding='utf-8') != "":
                 print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))

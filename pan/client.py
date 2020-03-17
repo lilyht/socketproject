@@ -11,7 +11,9 @@ import time
 import threading
 
 serverIP = '127.0.0.1'
+# serverIP = '172.28.179.111'
 serverPort = 12000
+
 
 def main():
     # 程序的开始，所有的窗口都由登陆界面（w1）衍生
@@ -37,7 +39,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.client.settimeout(10) # 设置连接超时
         # time.sleep(2)
         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
-        self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1) # 在客户端开启心跳维护
+        # self.client.settimeout(100)
+        self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
 
         # 子窗口对象
@@ -56,7 +59,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             time.sleep(4)
             a += 1
             keepconn = "已连接"+str(a*4)+"秒"
-            self.client.send(bytes(keepconn,'UTF-8')) # 向服务端发送消息
+            self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
 
     # 点击注册按钮时的响应
     def regi(self):
@@ -88,9 +91,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         userinfo = 'log' + ' ' + self.user + ' ' + self.password
         print(userinfo)
         if self.user == "":
-            print("用户名不能为空！")
+            errorInfo = QMessageBox.information(self, "格式错误", "用户名不能为空！")
         elif self.password == "":
-            print("密码不能为空！")
+            errorInfo = QMessageBox.information(self, "格式错误", "密码不能为空！")
         else:
 
             print("客户端开始发送登录指令和用户名密码")

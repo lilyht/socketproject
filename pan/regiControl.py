@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow,QMessageBox
 from PyQt5 import QtCore, QtGui, QtWidgets
 from Ui_regiWindow import *
 from PyQt5.QtCore import pyqtSignal
@@ -19,14 +19,14 @@ class regiWindow(QMainWindow, Ui_regiWindow):
         password = self.passwordLine.text()
         reenter = self.reenterLine.text()
         if user == "":
-            print("用户名不能为空！")
+            errorInfo = QMessageBox.information(self, "格式错误", "用户名不能为空！")
         elif password == "":
-            print("密码不能为空！")
+            errorInfo = QMessageBox.information(self, "格式错误", "密码不能为空！")
         elif reenter == "":
-            print("确认密码不能为空！")
+            errorInfo = QMessageBox.information(self, "格式错误", "确认密码不能为空！")
         else:
             if password != reenter:
-                print("两次密码输入不同")
+                errorInfo = QMessageBox.information(self, "格式错误", "两次密码输入不一致！")
             else:
                 print("发送给服务器进行检测")
                 self.confirmSignal.emit(user, password)
