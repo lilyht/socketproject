@@ -4,8 +4,8 @@ import threading
 import datetime
 # -*- coding: UTF-8 -*-
 
-# serverIP = '127.0.0.1'
-serverIP = '0.0.0.0'
+serverIP = '127.0.0.1'
+# serverIP = '0.0.0.0'
 serverPort = 12000
 
 
@@ -55,7 +55,11 @@ def dealConn(conn, addr):
             print('Server received command: %s' % cmd)
             if cmd == "cl":
                 print(dstr[1])
-                dealCl(conn, addr, user)
+                filepath = dstr[2]
+                filename = dstr[3]
+                md5 = dstr[4]
+                finfo = dstr[5]
+                dealCl(conn, addr, user, filepath, filename, md5, finfo)
             if cmd == "ls":
                 dealLs(conn, addr, user)
             if cmd == "que":
@@ -77,6 +81,7 @@ def dealRegi(conn, addr, username, psw):
 
     # 使用execute方法执行SQL语句，查询密码是否匹配
     sql = "SELECT password FROM USER WHERE user = '%s'" % username
+    flag = False
     try:
         cursor.execute(sql)
         res = cursor.fetchone()
@@ -92,15 +97,51 @@ def dealRegi(conn, addr, username, psw):
             cursor.execute(sql, val)
             db.commit()
             print("插入成功")
+            flag = True
             conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
             conn.send("-1".encode("UTF-8"))
             print("插入失败")
+    print(flag)
+    if flag == True:
+        # 注册成功后将设备名插入设备信息列表(user, NULL, NULL, NULL, NULL)
+        sql = "INSERT INTO DeviceInfo (user) VALUES ('%s')" % username
+        try:
+            cursor.execute(sql)
+            db.commit()
+            print("插入设备信息表成功")
+            flag = True
+            conn.send("1".encode("UTF-8"))
+        except ValueError as e:
+            print("--->", e)
+            conn.send("-1".encode("UTF-8"))
+            print("插入设备信息表失败")
+    
     return None
 
 
-def dealCl(conn, addr, user):
+def dealCl(conn, addr, user, fpath, fname, ID, finfo):
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    # 使用cursor()方法获取操作游标
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+
+    # 使用execute方法执行SQL语句，插入资源信息
+    sql = "INSERT INTO ResourceInfo (ID, user, fname, fpath) VALUES (%s, %s, %s, %s)"
+    val = (ID, user, fname, fpath)
+    try:
+        cursor.execute(sql, val)
+        db.commit()
+        print("插入资源信息成功")
+        conn.send("1".encode("UTF-8"))
+    except ValueError as e:
+        print("--->", e)
+        conn.send("-1".encode("UTF-8"))
+        print("插入资源信息失败")
     return None
 
 
@@ -117,9 +158,8 @@ def dealTr(conn, addr, user):
 
 
 def dealLogin(conn, addr, username, psw):
-
+    # 是否在线
     # print(username, psw)
-
     # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     # 使用cursor()方法获取操作游标
@@ -142,12 +182,30 @@ def dealLogin(conn, addr, username, psw):
         if res[0] == psw:
             reply = "1" + " " + addr[0] + " " + str(addr[1])
             conn.send(reply.encode("UTF-8"))
+
+            # 更新设备信息列表，设置为在线，并填写IP和端口号
+            print(type(str(addr[1])))
+            print(addr[1])
+            # 错误！
+            sql = "UPDATE deviceinfo SET status=1, IP='%s', port='%s' WHERE user='%s'"
+            val = (addr[0], str(addr[1]), username)
+            try:
+                cursor.execute(sql, val)
+                db.commit()
+                print("更新设备信息列表成功")
+                conn.send("1".encode("UTF-8"))
+            except ValueError as e:
+                print("--->", e)
+                conn.send("-1".encode("UTF-8"))
+                print("更新设备信息列表失败")
             return username
         else:
             # print("password in db:{}".format(res[0]))
             # print("输入的psw:{}".format(psw))
             conn.send("0".encode("UTF-8"))
             return ""
+        
+
 
 
 # x心跳检测保留函数
