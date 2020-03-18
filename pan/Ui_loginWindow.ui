@@ -174,8 +174,8 @@ font-weight: bold;
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="passwordLine">
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="userLine">
        <property name="styleSheet">
         <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
 border-style: none;
@@ -187,18 +187,21 @@ background-color: rgba(255,255,255,0)
         <bool>true</bool>
        </property>
        <property name="echoMode">
-        <enum>QLineEdit::Password</enum>
+        <enum>QLineEdit::Normal</enum>
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="userLine">
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="passwordLine">
        <property name="styleSheet">
         <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
 border-style: none;
 border-bottom: 1px solid rgb(135, 135, 135);
 background-color: rgba(255,255,255,0)
 </string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
        </property>
       </widget>
      </item>
@@ -211,7 +214,7 @@ background-color: rgba(255,255,255,0)
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>17</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

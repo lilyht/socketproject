@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Ui_loginWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -97,27 +97,28 @@ class Ui_loginWindow(object):
         self.userLabel.setAlignment(QtCore.Qt.AlignCenter)
         self.userLabel.setObjectName("userLabel")
         self.gridLayout.addWidget(self.userLabel, 0, 0, 1, 1, QtCore.Qt.AlignLeft)
-        self.passwordLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
-        self.passwordLine.setStyleSheet("font: 25 12pt \"微软雅黑 Light\";\n"
-"border-style: none;\n"
-"border-bottom: 1px solid rgb(135, 135, 135);\n"
-"background-color: rgba(255,255,255,0)\n"
-"")
-        self.passwordLine.setFrame(True)
-        self.passwordLine.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.passwordLine.setObjectName("passwordLine")
-        self.gridLayout.addWidget(self.passwordLine, 1, 1, 1, 1)
         self.userLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
         self.userLine.setStyleSheet("font: 25 12pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border-bottom: 1px solid rgb(135, 135, 135);\n"
 "background-color: rgba(255,255,255,0)\n"
 "")
+        self.userLine.setFrame(True)
+        self.userLine.setEchoMode(QtWidgets.QLineEdit.Normal)
         self.userLine.setObjectName("userLine")
         self.gridLayout.addWidget(self.userLine, 0, 1, 1, 1)
+        self.passwordLine = QtWidgets.QLineEdit(self.gridLayoutWidget)
+        self.passwordLine.setStyleSheet("font: 25 12pt \"微软雅黑 Light\";\n"
+"border-style: none;\n"
+"border-bottom: 1px solid rgb(135, 135, 135);\n"
+"background-color: rgba(255,255,255,0)\n"
+"")
+        self.passwordLine.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.passwordLine.setObjectName("passwordLine")
+        self.gridLayout.addWidget(self.passwordLine, 1, 1, 1, 1)
         loginWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(loginWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 17))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
         loginWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(loginWindow)

@@ -80,15 +80,29 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.usernameLine.setText(user)
         self.w3.ipLine.setText(clientIP)
         self.w3.portLine.setText(clientPort)
+
         heart.start()
 
+        self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
         self.w3.exitSignal.connect(self.recvPanExit)  # 接收到网盘界面的退出
+        self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
 
     # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
         self.regiUser = text1
         self.regiPassword = text2
         self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
+
+    # 接收网盘界面的资源声明消息
+    def recvPanClare(self, localFilePath):
+        clareInfo = 'cl' + ' ' + localFilePath
+        self.client.send(clareInfo.encode("UTF-8"))
+        print('声明资源：'+localFilePath)
+
+    # 接收网盘界面的显示文件列表消息
+    def recvPanShowList(self):
+        self.client.send("ls".encode("UTF-8"))
+        print("请求显示文件列表")
 
     def recvPanExit(self):
         self.client.close()  # 断开连接
@@ -111,7 +125,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             self.client.send(userinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
 
             reply = self.client.recv(1024)  # 接收服务器的回复
-            reply = reply.decode(encoding='utf-8')
+            reply = reply.decode(encoding='UTF-8')
             print(reply)
             if reply == "0":
                 logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
@@ -133,7 +147,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         print("客户端开始发送注册指令和用户名密码")
         self.client.send(regiuserinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
         reply = self.client.recv(1024)  # 接收服务器的回复
-        reply = reply.decode(encoding='utf-8')
+        reply = reply.decode(encoding='UTF-8')
         print(reply)
         if reply == "1":
             regiInfo = QMessageBox.information(self, "注册反馈", "注册成功！请移步登录")

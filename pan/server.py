@@ -25,7 +25,7 @@ def dealConn(conn, addr):
     # 获取客户发送的指令，如果登录成功则跳出循环
     while True:
         data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
-        datastr = data.decode(encoding='utf-8')  # type: 'str'
+        datastr = data.decode(encoding='UTF-8')  # type: 'str'
         if datastr != "":
             print("收到有效消息")
             dstr = datastr.split()
@@ -47,17 +47,17 @@ def dealConn(conn, addr):
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
         data = conn.recv(1024)
-        datastr = data.decode(encoding='utf-8')  # type: 'str'
+        datastr = data.decode(encoding='UTF-8')  # type: 'str'
         if datastr != "":
-            dstr = datastr.split()
+            dstr = datastr.split(' ')
             cmd = dstr[0]
 
             print('Server received command: %s' % cmd)
-
+            if cmd == "cl":
+                print(dstr[1])
+                dealCl(conn, addr, user)
             if cmd == "ls":
                 dealLs(conn, addr, user)
-            if cmd == "cd":
-                dealCd(conn, addr, user)
             if cmd == "que":
                 dealQue(conn, addr, user)
 
@@ -100,7 +100,7 @@ def dealRegi(conn, addr, username, psw):
     return None
 
 
-def dealCd(conn, addr, user):
+def dealCl(conn, addr, user):
     return None
 
 
@@ -157,9 +157,9 @@ def checkConnection(conn, addr):
     starttime = datetime.datetime.now()
     # print('client addr',addr)
     client_msg=conn.recv(1024)
-    if client_msg.decode(encoding='utf-8') !=  "":
-        # print('client msg: %s' %(str(client_msg,'utf-8')))
-        print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
+    if client_msg.decode(encoding='UTF-8') !=  "":
+        # print('client msg: %s' %(str(client_msg,'UTF-8')))
+        print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
         keep_alive(conn, addr)
 
 
@@ -171,8 +171,8 @@ def keep_alive(conn, addr):
             serverSocket.settimeout(5)
             # print('---------------------------------')
             client_msg = conn.recv(1024) # 客户端发送过来的消息
-            if client_msg.decode(encoding='utf-8') != "":
-                print("msg from client {} : {}".format(addr, str(client_msg, 'utf-8')))
+            if client_msg.decode(encoding='UTF-8') != "":
+                print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
         except:
             a = 2
             endtime = datetime.datetime.now()
