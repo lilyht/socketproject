@@ -54,7 +54,7 @@ def dealConn(conn, addr):
 
             print('Server received command: %s' % cmd)
             if cmd == "cl":
-                print(dstr[1])
+                print(dstr)
                 dealCl(conn, addr, user)
             if cmd == "ls":
                 dealLs(conn, addr, user)

@@ -94,10 +94,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
 
     # 接收网盘界面的资源声明消息
-    def recvPanClare(self, localFilePath):
-        clareInfo = 'cl' + ' ' + localFilePath
+    def recvPanClare(self, localFileInfo):
+        clareInfo = 'cl' + ' ' + localFileInfo
         self.client.send(clareInfo.encode("UTF-8"))
-        print('声明资源：'+localFilePath)
+        print(clareInfo)
 
     # 接收网盘界面的显示文件列表消息
     def recvPanShowList(self):
