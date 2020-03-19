@@ -17,8 +17,8 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.setupUi(self)
 
         self.user = ""
-        self.clientIP = ""
-        self.clientPort = ""
+        # self.clientIP = ""
+        # self.clientPort = ""
         self.nw = noteWindow()  # 备注窗口
         self.fileInfo = ""
 
@@ -45,6 +45,7 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.fileInfo = absPath + " " + filename + " " + file_md5 + " "  # 不完整的资源信息
         self.nw.show()  # 显示备注填写框
 
+    # 接收备注信息并且将所有信息发送到父窗口
     def recvNoteAndSendAll(self, notetext):
         if notetext != "":
             notetext = notetext.replace(' ', '-')
