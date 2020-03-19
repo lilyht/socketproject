@@ -182,15 +182,13 @@ def dealLogin(conn, addr, username, psw):
         if res[0] == psw:
             reply = "1" + " " + addr[0] + " " + str(addr[1])
             conn.send(reply.encode("UTF-8"))
-
+            
             # 更新设备信息列表，设置为在线，并填写IP和端口号
-            print(type(str(addr[1])))
-            print(addr[1])
-            # 错误！
-            sql = "UPDATE deviceinfo SET status=1, IP='%s', port='%s' WHERE user='%s'"
-            val = (addr[0], str(addr[1]), username)
+            # print(str(addr[1]))
+            portstr = str(addr[1])
+            sql1 = "UPDATE deviceinfo SET status=1, IP='{}', port='{}' WHERE user='{}'".format(addr[0], portstr, username)
             try:
-                cursor.execute(sql, val)
+                cursor.execute(sql1)
                 db.commit()
                 print("更新设备信息列表成功")
                 conn.send("1".encode("UTF-8"))
@@ -222,6 +220,7 @@ def checkConnection(conn, addr):
 
 
 def keep_alive(conn, addr):
+    print(addr)
     global endtime
     a = 1
     while a == 1:
@@ -235,7 +234,27 @@ def keep_alive(conn, addr):
             a = 2
             endtime = datetime.datetime.now()
     # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
+    
     print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+    # 设备下线，更新设备信息表
+    # 打开数据库连接
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+    
+    sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
+    try:
+        cursor.execute(sql1)
+        db.commit()
+        print("设备下线，更新设备信息列表成功")
+        conn.send("1".encode("UTF-8"))
+    except ValueError as e:
+        print("--->", e)
+        conn.send("-1".encode("UTF-8"))
+        print("设备下线，更新设备信息列表失败")
     '''
     处理断开
     '''

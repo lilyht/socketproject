@@ -63,7 +63,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             time.sleep(4)
             a += 1
             keepconn = "已连接"+str(a*4)+"秒"
-            self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
+            self.client.send(keepconn.encode("UTF-8"))  # 向服务端发送消息
 
     # 点击注册按钮时的响应
     def regi(self):
