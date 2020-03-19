@@ -2,12 +2,12 @@ from socket import *
 import MySQLdb
 import threading
 import datetime
+
 # -*- coding: UTF-8 -*-
 
 serverIP = '127.0.0.1'
 # serverIP = '0.0.0.0'
 serverPort = 12000
-
 
 maxN = 5  # 最大连接数
 buf = 2048
@@ -50,21 +50,20 @@ def dealConn(conn, addr):
         datastr = data.decode(encoding='UTF-8')  # type: 'str'
         if datastr != "":
             dstr = datastr.split(' ')
+            print(dstr)
             cmd = dstr[0]
 
             print('Server received command: %s' % cmd)
             if cmd == "cl":
-                print(dstr[1])
-                filepath = dstr[2]
-                filename = dstr[3]
-                md5 = dstr[4]
-                finfo = dstr[5]
+                filepath = dstr[1]
+                filename = dstr[2]
+                md5 = dstr[3]
+                finfo = dstr[4]
                 dealCl(conn, addr, user, filepath, filename, md5, finfo)
             if cmd == "ls":
                 dealLs(conn, addr, user)
             if cmd == "que":
                 dealQue(conn, addr, user)
-
 
     conn.close()
 
@@ -117,7 +116,7 @@ def dealRegi(conn, addr, username, psw):
             print("--->", e)
             conn.send("-1".encode("UTF-8"))
             print("插入设备信息表失败")
-    
+
     return None
 
 
@@ -131,8 +130,8 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
         print("Error: unable to use database!")
 
     # 使用execute方法执行SQL语句，插入资源信息
-    sql = "INSERT INTO ResourceInfo (ID, user, fname, fpath) VALUES (%s, %s, %s, %s)"
-    val = (ID, user, fname, fpath)
+    sql = "INSERT INTO ResourceInfo (ID, user, fname, fpath, note) VALUES (%s, %s, %s, %s, %s)"
+    val = (ID, user, fname, fpath, finfo)
     try:
         cursor.execute(sql, val)
         db.commit()
@@ -146,7 +145,32 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
 
 
 def dealLs(conn, addr, user):
-    return None
+    # 打开数据库连接
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    # 使用cursor()方法获取操作游标
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+
+    # 使用execute方法执行SQL语句，查询密码是否匹配
+    sql = "SELECT * FROM Resourceinfo WHERE user = '%s'" % user
+
+    try:
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        for one in  res:
+            # print(one)
+            replyInfo = one[0] + " " + one[2] + " " + one[3] + " " + one[4]
+            print(replyInfo)
+
+        # conn.send("0".encode("UTF-8"))  # 表里已经存在该用户名了，拒绝
+        return None
+
+    except:
+        print("NULL")
+        return None
 
 
 def dealQue(conn, addr, user):
@@ -182,11 +206,12 @@ def dealLogin(conn, addr, username, psw):
         if res[0] == psw:
             reply = "1" + " " + addr[0] + " " + str(addr[1])
             conn.send(reply.encode("UTF-8"))
-            
+
             # 更新设备信息列表，设置为在线，并填写IP和端口号
             # print(str(addr[1]))
             portstr = str(addr[1])
-            sql1 = "UPDATE deviceinfo SET status=1, IP='{}', port='{}' WHERE user='{}'".format(addr[0], portstr, username)
+            sql1 = "UPDATE deviceinfo SET status=1, IP='{}', port='{}' WHERE user='{}'".format(addr[0], portstr,
+                                                                                               username)
             try:
                 cursor.execute(sql1)
                 db.commit()
@@ -202,8 +227,6 @@ def dealLogin(conn, addr, username, psw):
             # print("输入的psw:{}".format(psw))
             conn.send("0".encode("UTF-8"))
             return ""
-        
-
 
 
 # x心跳检测保留函数
@@ -212,8 +235,8 @@ def checkConnection(conn, addr):
     serverSocket.settimeout(None)
     starttime = datetime.datetime.now()
     # print('client addr',addr)
-    client_msg=conn.recv(1024)
-    if client_msg.decode(encoding='UTF-8') !=  "":
+    client_msg = conn.recv(1024)
+    if client_msg.decode(encoding='UTF-8') != "":
         # print('client msg: %s' %(str(client_msg,'UTF-8')))
         print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
         keep_alive(conn, addr)
@@ -227,14 +250,14 @@ def keep_alive(conn, addr):
         try:
             serverSocket.settimeout(5)
             # print('---------------------------------')
-            client_msg = conn.recv(1024) # 客户端发送过来的消息
+            client_msg = conn.recv(1024)  # 客户端发送过来的消息
             if client_msg.decode(encoding='UTF-8') != "":
                 print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
         except:
             a = 2
             endtime = datetime.datetime.now()
     # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
-    
+
     print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
     # 设备下线，更新设备信息表
     # 打开数据库连接
@@ -244,7 +267,7 @@ def keep_alive(conn, addr):
         cursor.execute("use pandb")
     except:
         print("Error: unable to use database!")
-    
+
     sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
     try:
         cursor.execute(sql1)
