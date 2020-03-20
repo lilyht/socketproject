@@ -13,6 +13,7 @@ import threading
 serverIP = '127.0.0.1'
 # serverIP = '172.28.179.111'
 serverPort = 12000
+buf = 2048
 
 
 def main():
@@ -25,6 +26,7 @@ def main():
 
 # 登陆界面的类
 class loginWindow(QMainWindow, Ui_loginWindow):
+    fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
 
     def __init__(self, parent=None):
         super(loginWindow, self).__init__(parent)
@@ -40,8 +42,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         # time.sleep(2)
         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
         # self.client.settimeout(100)
-        # self.clientIP = ""
-        # self.clientPort = ""
+
         self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
 
@@ -55,6 +56,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.regiButton.clicked.connect(self.regi)
         # 输入密码按回车键也是跳转到检验函数
         self.passwordLine.returnPressed.connect(self.check)
+        # 回传我的文件信息到网盘界面
+        self.fileInfoSignal.connect(self.w3.recvFileInfo)
 
     # 发送心跳包
     def sendHeartbeat(self):
@@ -77,10 +80,6 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.show()  # 网盘界面弹出
         self.w3.user = user
         self.w3.usernameLine.setText(user)
-        # self.w3.clientIP = clientIP
-        # self.w3.clientPort = clientPort
-        # self.w3.ipLine.setText(clientIP)
-        # self.w3.portLine.setText(clientPort)
 
         heart.start()
 
@@ -98,12 +97,19 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def recvPanClare(self, localFileInfo):
         clareInfo = 'cl' + ' ' + localFileInfo
         self.client.send(clareInfo.encode("UTF-8"))
-        print(clareInfo)
+        # print(clareInfo)
+        waste = self.client.recv(buf)  # 接收冗余回复（插入资源信息表的反馈）
 
     # 接收网盘界面的显示文件列表消息
     def recvPanShowList(self):
         self.client.send("ls".encode("UTF-8"))
         print("请求显示文件列表")
+        wholeInfo = self.client.recv(buf)
+        wholeInfo = wholeInfo.decode("UTF-8")
+
+        wholeInfo = wholeInfo.split("###")
+
+        self.fileInfoSignal.emit(wholeInfo)
 
     def recvPanExit(self):
         self.client.close()  # 断开连接
@@ -125,7 +131,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
             self.client.send(userinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
 
-            reply = self.client.recv(1024)  # 接收服务器的回复
+            reply = self.client.recv(buf)  # 接收服务器的回复
             reply = reply.decode(encoding='UTF-8')
             print(reply)
             if reply == "0":
@@ -133,10 +139,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             elif reply == "-1":
                 logInfo = QMessageBox.information(self, "登录反馈", "用户不存在！")
             else:
-                # reply = reply.split()
-                # self.clientIP = reply[1]
-                # self.clientPort = reply[2]
                 logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
+                waste = self.client.recv(buf)  # 接收冗余回复（更新设备列表）
                 self.pan(self.user)  # 调用pan界面响应
                 self.hide()  # 登录界面隐藏，但仍然能传递参数
 
@@ -147,11 +151,12 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         print(regiuserinfo)
         print("客户端开始发送注册指令和用户名密码")
         self.client.send(regiuserinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
-        reply = self.client.recv(1024)  # 接收服务器的回复
+        reply = self.client.recv(buf)  # 接收服务器的回复
         reply = reply.decode(encoding='UTF-8')
         print(reply)
         if reply == "1":
             regiInfo = QMessageBox.information(self, "注册反馈", "注册成功！请移步登录")
+            waste = self.client.recv(buf)  # 接收冗余回复（插入设备信息表的反馈）
             self.w2.close()
         elif reply == "0":
             regiInfo = QMessageBox.information(self, "注册反馈", "用户名已存在！")

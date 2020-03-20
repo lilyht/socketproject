@@ -5,6 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from noteControl import noteWindow
 from Ui_panWindow import *
 from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtGui import  QStandardItemModel
 
 
 class panWindow(QMainWindow, Ui_panWindow):
@@ -17,13 +18,13 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.setupUi(self)
 
         self.user = ""
-        # self.clientIP = ""
-        # self.clientPort = ""
         self.nw = noteWindow()  # 备注窗口
         self.fileInfo = ""
+        self.myFileModel = QStandardItemModel()
 
         self.nw.noteSignal.connect(self.recvNoteAndSendAll)  # 接收备注文本
 
+        # 槽函数
         self.exitButton.clicked.connect(self.shutdown)
         self.declareButton.clicked.connect(self.getLocalFile)
         self.showButton.clicked.connect(self.showList)
@@ -32,6 +33,8 @@ class panWindow(QMainWindow, Ui_panWindow):
     def getLocalFile(self):
         clarePath = QtWidgets.QFileDialog.getOpenFileName(self, "资源声明", "~")
         absPath = clarePath[0]  # 绝对路径
+        if absPath == '':
+            return None
         temp = absPath.split('/')
         filename = temp[-1]
 
@@ -63,4 +66,8 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.exitSignal.emit("-9")
         self.close()
 
-
+    # 收到显示文件列表的反馈
+    def recvFileInfo(self, wholeInfo):
+        print("收到文件信息：")
+        for info in wholeInfo:
+            print(info)

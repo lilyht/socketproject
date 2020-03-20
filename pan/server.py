@@ -154,18 +154,24 @@ def dealLs(conn, addr, user):
     except:
         print("Error: unable to use database!")
 
+    wholeInfo = ""
+
     # 使用execute方法执行SQL语句，查询密码是否匹配
     sql = "SELECT * FROM Resourceinfo WHERE user = '%s'" % user
 
     try:
         cursor.execute(sql)
         res = cursor.fetchall()
-        for one in  res:
+        for one in res:
             # print(one)
-            replyInfo = one[0] + " " + one[2] + " " + one[3] + " " + one[4]
+            replyInfo = one[0] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件名，绝对路径，备注
             print(replyInfo)
+            wholeInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
 
-        # conn.send("0".encode("UTF-8"))  # 表里已经存在该用户名了，拒绝
+        wholeInfo = wholeInfo[:-3]  # 去掉结尾多出来的三个#
+        conn.send(wholeInfo.encode("UTF-8"))
+        print(wholeInfo)
+
         return None
 
     except:
@@ -204,7 +210,8 @@ def dealLogin(conn, addr, username, psw):
         return ""
     else:
         if res[0] == psw:
-            reply = "1" + " " + addr[0] + " " + str(addr[1])
+            # reply = "1" + " " + addr[0] + " " + str(addr[1])
+            reply = "1"
             conn.send(reply.encode("UTF-8"))
 
             # 更新设备信息列表，设置为在线，并填写IP和端口号

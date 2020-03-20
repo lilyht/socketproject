@@ -11,6 +11,7 @@ class noteWindow(QMainWindow, Ui_noteWindow):
     def __init__(self, parent=None):
         super(noteWindow, self).__init__(parent)
         self.setupUi(self)
+        self.noteLine.setText("")
         self.pushButton.clicked.connect(self.sendNote)
 
     def sendNote(self):
