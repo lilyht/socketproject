@@ -176,6 +176,7 @@ def dealLs(conn, addr, user):
 
     except:
         print("NULL")
+        conn.send("NULL".encode("UTF-8"))
         return None
 
 
