@@ -13,6 +13,7 @@
 # serverIP = '127.0.0.1'
 # # serverIP = '172.28.179.111'
 # serverPort = 12000
+# buf = 2048
 #
 #
 # def main():
@@ -25,6 +26,7 @@
 #
 # # 登陆界面的类
 # class loginWindow(QMainWindow, Ui_loginWindow):
+#     fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
 #
 #     def __init__(self, parent=None):
 #         super(loginWindow, self).__init__(parent)
@@ -40,6 +42,8 @@
 #         # time.sleep(2)
 #         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
 #         # self.client.settimeout(100)
+#         self.alive = True
+#
 #         self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
 #         self.client.connect((serverIP, serverPort))
 #
@@ -51,6 +55,10 @@
 #         self.loginButton.clicked.connect(self.check)
 #         # 点击注册按钮时，弹出注册界面
 #         self.regiButton.clicked.connect(self.regi)
+#         # 输入密码按回车键也是跳转到检验函数
+#         self.passwordLine.returnPressed.connect(self.check)
+#         # 回传我的文件信息到网盘界面
+#         self.fileInfoSignal.connect(self.w3.recvFileInfo)
 #
 #     # 发送心跳包
 #     def sendHeartbeat(self):
@@ -58,8 +66,9 @@
 #         while True:
 #             time.sleep(4)
 #             a += 1
-#             keepconn = "已连接" + str(a * 4) + "秒"
-#             self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
+#             keepconn = "kc 已连接"+str(a*4)+"秒"
+#             # self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
+#             self.client.send(keepconn.encode("UTF-8"))
 #
 #     # 点击注册按钮时的响应
 #     def regi(self):
@@ -67,12 +76,17 @@
 #         self.w2.confirmSignal.connect(self.recvRegi)  # 获取登陆界面的提交信息
 #
 #     # 登录成功后的响应
-#     def pan(self):
+#     def pan(self, user):
 #         heart = threading.Thread(target=self.sendHeartbeat, args=())
 #         self.w3.show()  # 网盘界面弹出
+#         self.w3.user = user
+#         self.w3.usernameLine.setText(user)
+#
 #         heart.start()
 #
+#         self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
 #         self.w3.exitSignal.connect(self.recvPanExit)  # 接收到网盘界面的退出
+#         self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
 #
 #     # 接收注册界面传来的注册名和注册密码
 #     def recvRegi(self, text1, text2):
@@ -80,7 +94,26 @@
 #         self.regiPassword = text2
 #         self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
 #
+#     # 接收网盘界面的资源声明消息
+#     def recvPanClare(self, localFileInfo):
+#         clareInfo = 'cl' + ' ' + localFileInfo
+#         self.client.send(clareInfo.encode("UTF-8"))
+#         # print(clareInfo)
+#         waste = self.client.recv(buf)  # 接收冗余回复（插入资源信息表的反馈）
+#
+#     # 接收网盘界面的显示文件列表消息
+#     def recvPanShowList(self):
+#         self.client.send("ls".encode("UTF-8"))
+#         print("请求显示文件列表")
+#         wholeInfo = self.client.recv(buf)
+#         wholeInfo = wholeInfo.decode("UTF-8")
+#
+#         wholeInfo = wholeInfo.split("###")
+#
+#         self.fileInfoSignal.emit(wholeInfo)
+#
 #     def recvPanExit(self):
+#         self.alive = False
 #         self.client.close()  # 断开连接
 #         self.close()  # 退出程序
 #
@@ -100,18 +133,18 @@
 #
 #             self.client.send(userinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
 #
-#             reply = self.client.recv(1024)  # 接收服务器的回复
-#             reply = reply.decode(encoding='utf-8')
+#             reply = self.client.recv(buf)  # 接收服务器的回复
+#             reply = reply.decode(encoding='UTF-8')
 #             print(reply)
-#             if reply == "1":
-#                 logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
-#                 self.pan()  # 调用pan界面响应
-#                 self.hide()  # 登录界面隐藏，但仍然能传递参数
-#
-#             elif reply == "0":
+#             if reply == "0":
 #                 logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
-#             else:
+#             elif reply == "-1":
 #                 logInfo = QMessageBox.information(self, "登录反馈", "用户不存在！")
+#             else:
+#                 logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
+#                 waste = self.client.recv(buf)  # 接收冗余回复（更新设备列表）
+#                 self.pan(self.user)  # 调用pan界面响应
+#                 self.hide()  # 登录界面隐藏，但仍然能传递参数
 #
 #     # 向服务器发送注册输入的账号密码，检查是否已经有注册的了，如果没有，把账号密码添加进数据库。
 #     def check2(self, regiUsertext, regiPasswordtext):
@@ -120,11 +153,12 @@
 #         print(regiuserinfo)
 #         print("客户端开始发送注册指令和用户名密码")
 #         self.client.send(regiuserinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
-#         reply = self.client.recv(1024)  # 接收服务器的回复
-#         reply = reply.decode(encoding='utf-8')
+#         reply = self.client.recv(buf)  # 接收服务器的回复
+#         reply = reply.decode(encoding='UTF-8')
 #         print(reply)
 #         if reply == "1":
 #             regiInfo = QMessageBox.information(self, "注册反馈", "注册成功！请移步登录")
+#             waste = self.client.recv(buf)  # 接收冗余回复（插入设备信息表的反馈）
 #             self.w2.close()
 #         elif reply == "0":
 #             regiInfo = QMessageBox.information(self, "注册反馈", "用户名已存在！")

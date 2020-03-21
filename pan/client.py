@@ -38,10 +38,11 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.regiUser = ""
         self.regiPassword = ""
         self.client = socket(AF_INET, SOCK_STREAM)
-        self.client.settimeout(10) # 设置连接超时
+        self.client.settimeout(10)  # 设置连接超时
         # time.sleep(2)
         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
         # self.client.settimeout(100)
+        self.alive = True
 
         self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
@@ -65,7 +66,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         while True:
             time.sleep(4)
             a += 1
-            keepconn = "已连接"+str(a*4)+"秒"
+            keepconn = "kc 已连接"+str(a*4)+"秒"
             # self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
             self.client.send(keepconn.encode("UTF-8"))
 
@@ -112,6 +113,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.fileInfoSignal.emit(wholeInfo)
 
     def recvPanExit(self):
+        self.alive = False
         self.client.close()  # 断开连接
         self.close()  # 退出程序
 

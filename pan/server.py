@@ -11,8 +11,7 @@ serverPort = 12000
 
 maxN = 5  # 最大连接数
 buf = 2048
-starttime = None
-endtime = None
+
 
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind((serverIP, serverPort))
@@ -23,11 +22,13 @@ serverSocket.listen(maxN)
 # 收发数据
 def dealConn(conn, addr):
     # 获取客户发送的指令，如果登录成功则跳出循环
+    starttime = None
+    endtime = None
     while True:
         data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
         datastr = data.decode(encoding='UTF-8')  # type: 'str'
         if datastr != "":
-            print("收到有效消息")
+            # print("收到有效消息")
             dstr = datastr.split()
             cmd = dstr[0]
             username = dstr[1]
@@ -40,14 +41,20 @@ def dealConn(conn, addr):
                 user = dealLogin(conn, addr, username, psw)
                 if user != "":
                     print("登录成功！")
-                    recordConnThread = threading.Thread(target=checkConnection, args=(conn, addr))
-                    recordConnThread.start()
+                    # serverSocket.settimeout(None)
+                    starttime = datetime.datetime.now()
+                    # recordConnThread = threading.Thread(target=checkConnection, args=(conn, addr))
+                    # recordConnThread.start()
                     break
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
         data = conn.recv(1024)
+        if not data:  # 连接关闭时会导致持续接收空消息
+            break
+        serverSocket.settimeout(5)
         datastr = data.decode(encoding='UTF-8')  # type: 'str'
+
         if datastr != "":
             dstr = datastr.split(' ')
             print(dstr)
@@ -64,6 +71,35 @@ def dealConn(conn, addr):
                 dealLs(conn, addr, user)
             if cmd == "que":
                 dealQue(conn, addr, user)
+            if cmd == "kc":
+                kcInfo = dstr[1]
+                # if kcInfo != "":
+                print("msg from client {} : {}".format(addr, kcInfo))
+
+    endtime = datetime.datetime.now()
+    print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+    # 设备下线，更新设备信息表
+    # 打开数据库连接
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+
+    sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
+    try:
+        cursor.execute(sql1)
+        db.commit()
+        print("设备下线，更新设备信息列表成功")
+        # conn.send("1".encode("UTF-8"))
+    except ValueError as e:
+        print("--->", e)
+        # conn.send("-1".encode("UTF-8"))
+        print("设备下线，更新设备信息列表失败")
+    '''
+    处理断开
+    '''
 
     conn.close()
 
@@ -238,57 +274,60 @@ def dealLogin(conn, addr, username, psw):
 
 
 # x心跳检测保留函数
-def checkConnection(conn, addr):
-    global starttime
-    serverSocket.settimeout(None)
-    starttime = datetime.datetime.now()
-    # print('client addr',addr)
-    client_msg = conn.recv(1024)
-    if client_msg.decode(encoding='UTF-8') != "":
-        # print('client msg: %s' %(str(client_msg,'UTF-8')))
-        print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
-        keep_alive(conn, addr)
+# def checkConnection(conn, addr, kcInfo):
+#     global starttime
+#     serverSocket.settimeout(None)
+#     starttime = datetime.datetime.now()
+#
+#     client_msg = kcInfo
+#
+#     if client_msg != "":
+#         # print('client msg: %s' %(str(client_msg,'UTF-8')))
+#         # print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
+#         print("msg from client {} : {}".format(addr, client_msg))
+#         keep_alive(conn, addr)
 
 
-def keep_alive(conn, addr):
-    print(addr)
-    global endtime
-    a = 1
-    while a == 1:
-        try:
-            serverSocket.settimeout(5)
-            # print('---------------------------------')
-            client_msg = conn.recv(1024)  # 客户端发送过来的消息
-            if client_msg.decode(encoding='UTF-8') != "":
-                print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
-        except:
-            a = 2
-            endtime = datetime.datetime.now()
-    # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
+# def keep_alive(conn, addr, kcInfo):
+#     # print(addr)
+#     global endtime, starttime
+#     a = 1
+#
+#     try:
+#         serverSocket.settimeout(5)
+#         # print('---------------------------------')
+#         # client_msg = conn.recv(1024)  # 客户端发送过来的消息
+#         if kcInfo != "":
+#             print("msg from client {} : {}".format(addr, kcInfo))
+#     except:
+#         a = 2
+#         endtime = datetime.datetime.now()
 
-    print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
-    # 设备下线，更新设备信息表
-    # 打开数据库连接
-    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
-    cursor = db.cursor()
-    try:
-        cursor.execute("use pandb")
-    except:
-        print("Error: unable to use database!")
+        # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
 
-    sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
-    try:
-        cursor.execute(sql1)
-        db.commit()
-        print("设备下线，更新设备信息列表成功")
-        conn.send("1".encode("UTF-8"))
-    except ValueError as e:
-        print("--->", e)
-        conn.send("-1".encode("UTF-8"))
-        print("设备下线，更新设备信息列表失败")
-    '''
-    处理断开
-    '''
+    # print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+    # # 设备下线，更新设备信息表
+    # # 打开数据库连接
+    # db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    # cursor = db.cursor()
+    # try:
+    #     cursor.execute("use pandb")
+    # except:
+    #     print("Error: unable to use database!")
+    #
+    # sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
+    # try:
+    #     cursor.execute(sql1)
+    #     db.commit()
+    #     print("设备下线，更新设备信息列表成功")
+    #     conn.send("1".encode("UTF-8"))
+    # except ValueError as e:
+    #     print("--->", e)
+    #     conn.send("-1".encode("UTF-8"))
+    #     print("设备下线，更新设备信息列表失败")
+    # '''
+    # 处理断开
+    # '''
 
 
 def main():
