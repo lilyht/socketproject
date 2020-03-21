@@ -72,17 +72,17 @@ class panWindow(QMainWindow, Ui_panWindow):
     # 收到显示文件列表的反馈
     def recvFileInfo(self, wholeInfo):
         print("收到文件信息")
+        if wholeInfo != "NULL":
+            # 在表中显示结果
+            row = 0
+            for info in wholeInfo:
+                info = info.split(' ')
+                for column in range(4):
+                    item = QStandardItem(info[column])
+                    self.myFileModel.setItem(row, column, item)
+                row += 1
 
-        # 在表中显示结果
-        row = 0
-        for info in wholeInfo:
-            info = info.split(' ')
-            for column in range(4):
-                item = QStandardItem(info[column])
-                self.myFileModel.setItem(row, column, item)
-            row += 1
-
-        self.resultTable.setModel(self.myFileModel)
-        self.resultTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
-        self.resultTable.verticalHeader().show()  # 显示行头
+            self.resultTable.setModel(self.myFileModel)
+            self.resultTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
+            self.resultTable.verticalHeader().show()  # 显示行头
 
