@@ -12,7 +12,6 @@ serverPort = 12000
 maxN = 5  # 最大连接数
 buf = 2048
 
-
 serverSocket = socket(AF_INET, SOCK_STREAM)
 serverSocket.bind((serverIP, serverPort))
 # 最大连接数
@@ -70,11 +69,11 @@ def dealConn(conn, addr):
                     dealLs(conn, addr, user)
                 if cmd == "que":
                     dealQue(conn, addr, user)
-                if cmd == "cl":
-                    # 客户端传来 "sc" + "资源名" 
-                    fname = dstr[2]
+                if cmd == "sc":
+                    # 客户端传来 "sc" + "资源名"
+                    fname = dstr[1]
                     dealSc(conn, addr, user, fname)
-                    
+
                 if cmd == "kc":
                     kcInfo = dstr[1]
                     # if kcInfo != "":
@@ -127,6 +126,7 @@ def dealRegi(conn, addr, username, psw):
     try:
         cursor.execute(sql)
         res = cursor.fetchone()
+        # print(res)
         print("password in db:{}".format(res[0]))
 
         conn.send("0".encode("UTF-8"))  # 表里已经存在该用户名了，拒绝
@@ -202,9 +202,10 @@ def dealLs(conn, addr, user):
     # 使用execute方法执行SQL语句，查询密码是否匹配
     sql = "SELECT * FROM Resourceinfo WHERE user = '%s'" % user
 
-    try:
-        cursor.execute(sql)
-        res = cursor.fetchall()
+    cursor.execute(sql)
+    res = cursor.fetchall()
+    print(res)
+    if len(res):
         for one in res:
             # print(one)
             replyInfo = one[0] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件名，绝对路径，备注
@@ -214,13 +215,12 @@ def dealLs(conn, addr, user):
         wholeInfo = wholeInfo[:-3]  # 去掉结尾多出来的三个#
         conn.send(wholeInfo.encode("UTF-8"))
         print(wholeInfo)
-
         return None
-
-    except:
+    else:
         print("NULL")
         conn.send("NULL".encode("UTF-8"))
         return None
+
 
 def dealSc(conn, addr, user, fname):
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
@@ -234,24 +234,27 @@ def dealSc(conn, addr, user, fname):
     sql = "select r.ID, r.fpath, d.user, d.IP, d.port from resourceinfo r, deviceinfo d where r.fname='%s' and r.user=d.user" % fname
     hasFileInfo = ""
 
-    try:
-        cursor.execute(sql)
-        res = cursor.fetchall()
+
+    cursor.execute(sql)
+    res = cursor.fetchall()
+    # fetchall()不会报异常，因为它不是None，而是返回的是空列表，所以需要判断列表是否为空
+    if len(res):
         for one in res:
             # print(one)
-            replyInfo = one[0] + " " + one[1] + " " + one[2] + " " + one[3] + " " + one[4] # ID，文件路径，user, IP, 端口号
+            replyInfo = one[0] + " " + one[1] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件路径，user, IP, 端口号
             print(replyInfo)
-            hasFileInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
+            hasFileInfo += replyInfo + '***'  # 每个文件信息之间用三个#分割
 
         hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#
         conn.send(hasFileInfo.encode("UTF-8"))
         print(hasFileInfo)
         return None
-    except:
+    else:
         print("NULL")
         conn.send("NULL".encode("UTF-8"))
         return None
-    
+
+
 def dealQue(conn, addr, user):
     return None
 
@@ -339,31 +342,31 @@ def dealLogin(conn, addr, username, psw):
 #         a = 2
 #         endtime = datetime.datetime.now()
 
-        # print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
+# print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
 
-    # print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
-    # # 设备下线，更新设备信息表
-    # # 打开数据库连接
-    # db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
-    # cursor = db.cursor()
-    # try:
-    #     cursor.execute("use pandb")
-    # except:
-    #     print("Error: unable to use database!")
-    #
-    # sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
-    # try:
-    #     cursor.execute(sql1)
-    #     db.commit()
-    #     print("设备下线，更新设备信息列表成功")
-    #     conn.send("1".encode("UTF-8"))
-    # except ValueError as e:
-    #     print("--->", e)
-    #     conn.send("-1".encode("UTF-8"))
-    #     print("设备下线，更新设备信息列表失败")
-    # '''
-    # 处理断开
-    # '''
+# print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+# # 设备下线，更新设备信息表
+# # 打开数据库连接
+# db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+# cursor = db.cursor()
+# try:
+#     cursor.execute("use pandb")
+# except:
+#     print("Error: unable to use database!")
+#
+# sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
+# try:
+#     cursor.execute(sql1)
+#     db.commit()
+#     print("设备下线，更新设备信息列表成功")
+#     conn.send("1".encode("UTF-8"))
+# except ValueError as e:
+#     print("--->", e)
+#     conn.send("-1".encode("UTF-8"))
+#     print("设备下线，更新设备信息列表失败")
+# '''
+# 处理断开
+# '''
 
 
 def main():

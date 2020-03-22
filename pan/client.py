@@ -27,7 +27,7 @@ def main():
 # 登陆界面的类
 class loginWindow(QMainWindow, Ui_loginWindow):
     fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
-
+    userInfoSignal = pyqtSignal(list)  # 回传user信息
     def __init__(self, parent=None):
         super(loginWindow, self).__init__(parent)
         self.setupUi(self)
@@ -59,6 +59,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.passwordLine.returnPressed.connect(self.check)
         # 回传我的文件信息到网盘界面
         self.fileInfoSignal.connect(self.w3.recvFileInfo)
+        # 回传user信息到网盘界面
+        self.userInfoSignal.connect(self.w3.recvUserInfo)
+        # 退出程序
+        self.exitButton.clicked.connect(self.recvExit)
 
     # 发送心跳包
     def sendHeartbeat(self):
@@ -85,8 +89,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         heart.start()
 
         self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
-        self.w3.exitSignal.connect(self.recvPanExit)  # 接收到网盘界面的退出
+        self.w3.exitSignal.connect(self.recvExit)  # 接收到网盘界面的退出
         self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
+        self.w3.searchSignal.connect(self.recvSearchUser)  # 接收到网盘搜索资源持有者
 
     # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
@@ -105,6 +110,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def recvPanShowList(self):
         self.client.send("ls".encode("UTF-8"))
         print("请求显示文件列表")
+        # time.sleep(1)
         wholeInfo = self.client.recv(buf)
         wholeInfo = wholeInfo.decode("UTF-8")
 
@@ -112,7 +118,20 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
         self.fileInfoSignal.emit(wholeInfo)
 
-    def recvPanExit(self):
+    # 接收到网盘界面搜索资源持有者
+    def recvSearchUser(self, filename):
+        searchInfo = "sc" + ' ' + filename
+        print("搜索资源：", filename)
+        # time.sleep(1)
+        self.client.send(searchInfo.encode("UTF-8"))
+        resultInfo = self.client.recv(buf)
+        resultInfo = resultInfo.decode("UTF-8")
+        resultInfo = resultInfo.split("***")
+
+        self.userInfoSignal.emit(resultInfo)
+
+
+    def recvExit(self):
         self.alive = False
         self.client.close()  # 断开连接
         self.close()  # 退出程序
@@ -124,9 +143,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         userinfo = 'log' + ' ' + self.user + ' ' + self.password
         print(userinfo)
         if self.user == "":
-            errorInfo = QMessageBox.information(self, "格式错误", "用户名不能为空！")
+            errorInfo = QMessageBox.critical(self, "格式错误", "用户名不能为空！")
         elif self.password == "":
-            errorInfo = QMessageBox.information(self, "格式错误", "密码不能为空！")
+            errorInfo = QMessageBox.critical(self, "格式错误", "密码不能为空！")
         else:
 
             print("客户端开始发送登录指令和用户名密码")
@@ -137,9 +156,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             reply = reply.decode(encoding='UTF-8')
             print(reply)
             if reply == "0":
-                logInfo = QMessageBox.information(self, "登录反馈", "密码错误！")
+                logInfo = QMessageBox.critical(self, "登录反馈", "密码错误！")
             elif reply == "-1":
-                logInfo = QMessageBox.information(self, "登录反馈", "用户不存在！")
+                logInfo = QMessageBox.critical(self, "登录反馈", "用户不存在！")
             else:
                 logInfo = QMessageBox.information(self, "登录反馈", "登录成功！")
                 waste = self.client.recv(buf)  # 接收冗余回复（更新设备列表）
@@ -161,9 +180,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             waste = self.client.recv(buf)  # 接收冗余回复（插入设备信息表的反馈）
             self.w2.close()
         elif reply == "0":
-            regiInfo = QMessageBox.information(self, "注册反馈", "用户名已存在！")
+            regiInfo = QMessageBox.critical(self, "注册反馈", "用户名已存在！")
         else:
-            regiInfo = QMessageBox.information(self, "注册反馈", "出现未知错误！")
+            regiInfo = QMessageBox.critical(self, "注册反馈", "出现未知错误！")
 
 
 if __name__ == '__main__':

@@ -221,22 +221,5 @@ background-color: rgba(255,255,255,0)
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>exitButton</sender>
-   <signal>clicked()</signal>
-   <receiver>loginWindow</receiver>
-   <slot>close()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>552</x>
-     <y>411</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>291</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

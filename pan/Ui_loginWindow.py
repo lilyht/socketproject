@@ -126,7 +126,6 @@ class Ui_loginWindow(object):
         loginWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(loginWindow)
-        self.exitButton.clicked.connect(loginWindow.close)
         QtCore.QMetaObject.connectSlotsByName(loginWindow)
 
     def retranslateUi(self, loginWindow):

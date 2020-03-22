@@ -42,6 +42,7 @@ class Ui_panWindow(object):
 "border: 1px solid rgb(135, 135, 135);\n"
 "background-color: rgba(255,255,255,0)\n"
 "")
+        self.searchLine.setText("")
         self.searchLine.setObjectName("searchLine")
         self.searchButton = QtWidgets.QPushButton(self.centralwidget)
         self.searchButton.setGeometry(QtCore.QRect(90, 370, 171, 31))
@@ -67,6 +68,7 @@ class Ui_panWindow(object):
         self.queryLine.setGeometry(QtCore.QRect(530, 340, 191, 21))
         self.queryLine.setStyleSheet("font: 25 9pt \"微软雅黑 Light\";\n"
 "")
+        self.queryLine.setText("")
         self.queryLine.setObjectName("queryLine")
         self.resultTable = QtWidgets.QTableView(self.centralwidget)
         self.resultTable.setGeometry(QtCore.QRect(80, 80, 641, 231))
@@ -89,9 +91,9 @@ class Ui_panWindow(object):
         self.exitButton.setText(_translate("panWindow", "退出"))
         self.label.setText(_translate("panWindow", "云盘主面板"))
         self.usernameLine.setText(_translate("panWindow", "用户名"))
-        self.searchLine.setText(_translate("panWindow", "搜索框"))
+        self.searchLine.setPlaceholderText(_translate("panWindow", "请输入资源名称"))
         self.searchButton.setText(_translate("panWindow", "搜索资源持有者"))
         self.showButton.setText(_translate("panWindow", "显示文件列表"))
         self.declareButton.setText(_translate("panWindow", "资源声明*"))
         self.queryButton.setText(_translate("panWindow", "获取资源*"))
-        self.queryLine.setText(_translate("panWindow", "请求用户名"))
+        self.queryLine.setPlaceholderText(_translate("panWindow", "请输入持有者用户名"))

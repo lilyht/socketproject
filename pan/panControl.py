@@ -6,13 +6,14 @@ from noteControl import noteWindow
 from Ui_panWindow import *
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
-from PyQt5.QtWidgets import QTableView, QHeaderView
+from PyQt5.QtWidgets import QTableView, QHeaderView, QMessageBox
 
 
 class panWindow(QMainWindow, Ui_panWindow):
     exitSignal = pyqtSignal(str)  # 点击确认时发送信号
     clareSignal = pyqtSignal(str)  # 资源声明信号
     listSignal = pyqtSignal(str)  # 显示文件列表信号
+    searchSignal = pyqtSignal(str)  # 搜索资源持有者信号
 
     def __init__(self, parent=None):
         super(panWindow, self).__init__(parent)
@@ -22,8 +23,12 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.nw = noteWindow()  # 备注窗口
         self.fileInfo = ""
 
+        # model1
         self.myFileModel = QStandardItemModel()  # 显示文件列表的model
         self.myFileModel.setHorizontalHeaderLabels(['ID', '文件名', '绝对路径', '备注'])
+        # model2
+        self.userModel = QStandardItemModel()  # 显示资源持有者列表的model
+        self.userModel.setHorizontalHeaderLabels(['资源ID', '绝对路径', '用户名', 'IP地址', '端口号'])
 
         self.nw.noteSignal.connect(self.recvNoteAndSendAll)  # 接收备注文本
 
@@ -31,6 +36,7 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.exitButton.clicked.connect(self.shutdown)
         self.declareButton.clicked.connect(self.getLocalFile)
         self.showButton.clicked.connect(self.showList)
+        self.searchButton.clicked.connect(self.searchUserByFilename)
 
     # 点击资源声明后打开本地文件夹并获取路径，并经过client发送到服务器插入
     def getLocalFile(self):
@@ -65,14 +71,11 @@ class panWindow(QMainWindow, Ui_panWindow):
     def showList(self):
         self.listSignal.emit("")
 
-    def shutdown(self):
-        self.exitSignal.emit("-9")
-        self.close()
-
     # 收到显示文件列表的反馈
     def recvFileInfo(self, wholeInfo):
         print("收到文件信息")
-        if wholeInfo != "NULL":
+        print(wholeInfo)
+        if wholeInfo[0] != "NULL":
             # 在表中显示结果
             row = 0
             for info in wholeInfo:
@@ -85,4 +88,35 @@ class panWindow(QMainWindow, Ui_panWindow):
             self.resultTable.setModel(self.myFileModel)
             self.resultTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
             self.resultTable.verticalHeader().show()  # 显示行头
+        else:
+            print("无数据可显示")
+            errorInfo = QMessageBox.critical(self, "消息", "无数据可显示！")
 
+    # 点击搜索资源持有者
+    def searchUserByFilename(self):
+        filename = self.searchLine.text()
+        self.searchSignal.emit(filename)
+
+    # 收到user信息
+    def recvUserInfo(self, userInfo):
+        print("收到user信息")
+        if userInfo[0] != "NULL":
+            # 在表中显示结果
+            row = 0
+            for info in userInfo:
+                info = info.split(' ')
+                for column in range(5):
+                    item = QStandardItem(info[column])
+                    self.userModel.setItem(row, column, item)
+                row += 1
+
+            self.resultTable.setModel(self.userModel)
+            self.resultTable.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)  # 所有列自动拉伸，充满界面
+            self.resultTable.verticalHeader().show()  # 显示行头
+        else:
+            print("无数据可显示")
+            errorInfo = QMessageBox.critical(self, "消息", "无数据可显示！")
+
+    def shutdown(self):
+        self.exitSignal.emit("-9")
+        self.close()

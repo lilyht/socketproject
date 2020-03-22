@@ -88,7 +88,10 @@ background-color: rgba(255,255,255,0)
 </string>
     </property>
     <property name="text">
-     <string>搜索框</string>
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>请输入资源名称</string>
     </property>
    </widget>
    <widget class="QPushButton" name="searchButton">
@@ -167,7 +170,10 @@ loginButton hover{
 </string>
     </property>
     <property name="text">
-     <string>请求用户名</string>
+     <string/>
+    </property>
+    <property name="placeholderText">
+     <string>请输入持有者用户名</string>
     </property>
    </widget>
    <widget class="QTableView" name="resultTable">
