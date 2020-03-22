@@ -70,6 +70,11 @@ def dealConn(conn, addr):
                     dealLs(conn, addr, user)
                 if cmd == "que":
                     dealQue(conn, addr, user)
+                if cmd == "cl":
+                    # 客户端传来 "sc" + "资源名" 
+                    fname = dstr[2]
+                    dealSc(conn, addr, user, fname)
+                    
                 if cmd == "kc":
                     kcInfo = dstr[1]
                     # if kcInfo != "":
@@ -166,7 +171,7 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
         cursor.execute("use pandb")
     except:
         print("Error: unable to use database!")
-
+    print("dealCl")
     # 使用execute方法执行SQL语句，插入资源信息
     sql = "INSERT INTO ResourceInfo (ID, user, fname, fpath, note) VALUES (%s, %s, %s, %s, %s)"
     val = (ID, user, fname, fpath, finfo)
@@ -217,7 +222,36 @@ def dealLs(conn, addr, user):
         conn.send("NULL".encode("UTF-8"))
         return None
 
+def dealSc(conn, addr, user, fname):
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+        # 使用execute方法执行SQL语句，查询密码是否匹配
+    # sql = "SELECT * FROM Resourceinfo WHERE user = '%s'" % user
+    sql = "select r.ID, r.fpath, d.user, d.IP, d.port from resourceinfo r, deviceinfo d where r.fname='%s' and r.user=d.user" % fname
+    hasFileInfo = ""
 
+    try:
+        cursor.execute(sql)
+        res = cursor.fetchall()
+        for one in res:
+            # print(one)
+            replyInfo = one[0] + " " + one[1] + " " + one[2] + " " + one[3] + " " + one[4] # ID，文件路径，user, IP, 端口号
+            print(replyInfo)
+            hasFileInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
+
+        hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#
+        conn.send(hasFileInfo.encode("UTF-8"))
+        print(hasFileInfo)
+        return None
+    except:
+        print("NULL")
+        conn.send("NULL".encode("UTF-8"))
+        return None
+    
 def dealQue(conn, addr, user):
     return None
 
