@@ -22,13 +22,11 @@ serverSocket.listen(maxN)
 # 收发数据
 def dealConn(conn, addr):
     # 获取客户发送的指令，如果登录成功则跳出循环
-    starttime = None
-    endtime = None
+    serverSocket.settimeout(None)
     while True:
         data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
         datastr = data.decode(encoding='UTF-8')  # type: 'str'
         if datastr != "":
-            # print("收到有效消息")
             dstr = datastr.split()
             cmd = dstr[0]
             username = dstr[1]
@@ -49,37 +47,42 @@ def dealConn(conn, addr):
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
-        data = conn.recv(1024)
-        if not data:  # 连接关闭时会导致持续接收空消息
+        try:
+            serverSocket.settimeout(5)  # 网络故障时，会收不到消息，于是设置超时
+            data = conn.recv(1024)
+            if not data:  # 连接关闭时会导致持续接收空消息
+                break
+            datastr = data.decode(encoding='UTF-8')  # type: 'str'
+
+            if datastr != "":
+                dstr = datastr.split(' ')
+                # print(dstr)
+                cmd = dstr[0]
+
+                print('Server received command: %s' % cmd)
+                if cmd == "cl":
+                    filepath = dstr[1]
+                    filename = dstr[2]
+                    md5 = dstr[3]
+                    finfo = dstr[4]
+                    dealCl(conn, addr, user, filepath, filename, md5, finfo)
+                if cmd == "ls":
+                    dealLs(conn, addr, user)
+                if cmd == "que":
+                    dealQue(conn, addr, user)
+                if cmd == "kc":
+                    kcInfo = dstr[1]
+                    # if kcInfo != "":
+                    print("msg from client {} : {}".format(addr, kcInfo))
+        except:
+            # 消息超时
             break
-        serverSocket.settimeout(5)
-        datastr = data.decode(encoding='UTF-8')  # type: 'str'
 
-        if datastr != "":
-            dstr = datastr.split(' ')
-            print(dstr)
-            cmd = dstr[0]
-
-            print('Server received command: %s' % cmd)
-            if cmd == "cl":
-                filepath = dstr[1]
-                filename = dstr[2]
-                md5 = dstr[3]
-                finfo = dstr[4]
-                dealCl(conn, addr, user, filepath, filename, md5, finfo)
-            if cmd == "ls":
-                dealLs(conn, addr, user)
-            if cmd == "que":
-                dealQue(conn, addr, user)
-            if cmd == "kc":
-                kcInfo = dstr[1]
-                # if kcInfo != "":
-                print("msg from client {} : {}".format(addr, kcInfo))
-
+    # 无论收到空消息还是没收到消息，都打破循环跳转到这里
     endtime = datetime.datetime.now()
     print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
+
     # 设备下线，更新设备信息表
-    # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     cursor = db.cursor()
     try:
@@ -100,7 +103,6 @@ def dealConn(conn, addr):
     '''
     处理断开
     '''
-
     conn.close()
 
 
