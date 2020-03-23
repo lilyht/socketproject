@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="exitButton">
     <property name="geometry">
      <rect>
-      <x>620</x>
-      <y>460</y>
+      <x>610</x>
+      <y>490</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -30,8 +30,8 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>10</y>
+      <x>270</x>
+      <y>20</y>
       <width>271</width>
       <height>51</height>
      </rect>
@@ -58,14 +58,20 @@
    <widget class="QLineEdit" name="usernameLine">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>30</y>
-      <width>113</width>
-      <height>21</height>
+      <x>200</x>
+      <y>80</y>
+      <width>101</width>
+      <height>31</height>
      </rect>
     </property>
     <property name="focusPolicy">
      <enum>Qt::NoFocus</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 12pt &quot;Leelawadee UI Semilight&quot;;
+border-style: none;
+background-color: rgba(255,255,255,0)
+</string>
     </property>
     <property name="text">
      <string>用户名</string>
@@ -75,7 +81,7 @@
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>330</y>
+      <y>380</y>
       <width>191</width>
       <height>31</height>
      </rect>
@@ -97,9 +103,9 @@ background-color: rgba(255,255,255,0)
    <widget class="QPushButton" name="searchButton">
     <property name="geometry">
      <rect>
-      <x>90</x>
-      <y>370</y>
-      <width>171</width>
+      <x>340</x>
+      <y>380</y>
+      <width>191</width>
       <height>31</height>
      </rect>
     </property>
@@ -120,8 +126,8 @@ loginButton hover{
    <widget class="QPushButton" name="showButton">
     <property name="geometry">
      <rect>
-      <x>460</x>
-      <y>460</y>
+      <x>330</x>
+      <y>490</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -133,8 +139,8 @@ loginButton hover{
    <widget class="QPushButton" name="declareButton">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>460</y>
+      <x>80</x>
+      <y>490</y>
       <width>112</width>
       <height>32</height>
      </rect>
@@ -146,11 +152,20 @@ loginButton hover{
    <widget class="QPushButton" name="queryButton">
     <property name="geometry">
      <rect>
-      <x>540</x>
-      <y>370</y>
-      <width>171</width>
+      <x>340</x>
+      <y>420</y>
+      <width>191</width>
       <height>31</height>
      </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 10pt &quot;Microsoft YaHei UI Light&quot;;
+background-color: rgb(1, 90, 255);
+color: white;
+font-weight: bold;
+loginButton hover{
+	background-color: rgb(53, 148, 255)
+}</string>
     </property>
     <property name="text">
      <string>获取资源*</string>
@@ -159,14 +174,17 @@ loginButton hover{
    <widget class="QLineEdit" name="queryLine">
     <property name="geometry">
      <rect>
-      <x>530</x>
-      <y>340</y>
+      <x>80</x>
+      <y>420</y>
       <width>191</width>
-      <height>21</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="styleSheet">
      <string notr="true">font: 25 9pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
 </string>
     </property>
     <property name="text">
@@ -179,11 +197,40 @@ loginButton hover{
    <widget class="QTableView" name="resultTable">
     <property name="geometry">
      <rect>
-      <x>80</x>
-      <y>80</y>
+      <x>70</x>
+      <y>120</y>
       <width>641</width>
       <height>231</height>
      </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>60</x>
+      <y>80</y>
+      <width>141</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Leelawadee UI Semilight</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 12pt &quot;Leelawadee UI Semilight&quot;;
+</string>
+    </property>
+    <property name="text">
+     <string>当前用户：</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
     </property>
    </widget>
   </widget>
@@ -193,7 +240,7 @@ loginButton hover{
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
