@@ -2,7 +2,7 @@ from socket import *
 import MySQLdb
 import threading
 import datetime
-
+import json
 # -*- coding: UTF-8 -*-
 
 serverIP = '127.0.0.1'
@@ -24,12 +24,13 @@ def dealConn(conn, addr):
     serverSocket.settimeout(None)
     while True:
         data = conn.recv(1024)  # 接收用户名和密码，中间空格分隔
-        datastr = data.decode(encoding='UTF-8')  # type: 'str'
-        if datastr != "":
-            dstr = datastr.split()
-            cmd = dstr[0]
-            username = dstr[1]
-            psw = dstr[2]
+        dataJson = data.decode(encoding='UTF-8')  # type: 'json'
+        if dataJson != "":
+            dataContent = json.loads(dataJson)  # 解析Json消息
+            # 提取消息内容
+            cmd = dataContent['cmd']
+            username = dataContent['username']
+            psw = dataContent['psw']
 
             if cmd == "regi":
                 dealRegi(conn, addr, username, psw)
@@ -38,10 +39,7 @@ def dealConn(conn, addr):
                 user = dealLogin(conn, addr, username, psw)
                 if user != "":
                     print("登录成功！")
-                    # serverSocket.settimeout(None)
                     starttime = datetime.datetime.now()
-                    # recordConnThread = threading.Thread(target=checkConnection, args=(conn, addr))
-                    # recordConnThread.start()
                     break
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
@@ -55,7 +53,6 @@ def dealConn(conn, addr):
 
             if datastr != "":
                 dstr = datastr.split(' ')
-                # print(dstr)
                 cmd = dstr[0]
 
                 print('Server received command: %s' % cmd)
@@ -286,7 +283,6 @@ def dealLogin(conn, addr, username, psw):
         return ""
     else:
         if res[0] == psw:
-            # reply = "1" + " " + addr[0] + " " + str(addr[1])
             reply = "1"
             conn.send(reply.encode("UTF-8"))
 
@@ -310,63 +306,6 @@ def dealLogin(conn, addr, username, psw):
             # print("输入的psw:{}".format(psw))
             conn.send("0".encode("UTF-8"))
             return ""
-
-
-# x心跳检测保留函数
-# def checkConnection(conn, addr, kcInfo):
-#     global starttime
-#     serverSocket.settimeout(None)
-#     starttime = datetime.datetime.now()
-#
-#     client_msg = kcInfo
-#
-#     if client_msg != "":
-#         # print('client msg: %s' %(str(client_msg,'UTF-8')))
-#         # print("msg from client {} : {}".format(addr, str(client_msg, 'UTF-8')))
-#         print("msg from client {} : {}".format(addr, client_msg))
-#         keep_alive(conn, addr)
-
-
-# def keep_alive(conn, addr, kcInfo):
-#     # print(addr)
-#     global endtime, starttime
-#     a = 1
-#
-#     try:
-#         serverSocket.settimeout(5)
-#         # print('---------------------------------')
-#         # client_msg = conn.recv(1024)  # 客户端发送过来的消息
-#         if kcInfo != "":
-#             print("msg from client {} : {}".format(addr, kcInfo))
-#     except:
-#         a = 2
-#         endtime = datetime.datetime.now()
-
-# print('连接已断开，本次连接持续 %s 秒'%str((endtime - starttime).seconds))
-
-# print("client {} 连接已断开，本次连接持续 {}秒".format(addr, str((endtime - starttime).seconds)))
-# # 设备下线，更新设备信息表
-# # 打开数据库连接
-# db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
-# cursor = db.cursor()
-# try:
-#     cursor.execute("use pandb")
-# except:
-#     print("Error: unable to use database!")
-#
-# sql1 = "UPDATE deviceinfo SET status=0 WHERE IP='{}' and port='{}'".format(addr[0], str(addr[1]))
-# try:
-#     cursor.execute(sql1)
-#     db.commit()
-#     print("设备下线，更新设备信息列表成功")
-#     conn.send("1".encode("UTF-8"))
-# except ValueError as e:
-#     print("--->", e)
-#     conn.send("-1".encode("UTF-8"))
-#     print("设备下线，更新设备信息列表失败")
-# '''
-# 处理断开
-# '''
 
 
 def main():

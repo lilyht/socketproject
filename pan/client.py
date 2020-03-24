@@ -9,6 +9,7 @@ from panControl import panWindow
 from socket import *
 import time
 import threading
+import json
 
 serverIP = '127.0.0.1'
 # serverIP = '172.28.179.111'
@@ -28,6 +29,7 @@ def main():
 class loginWindow(QMainWindow, Ui_loginWindow):
     fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
     userInfoSignal = pyqtSignal(list)  # 回传user信息
+
     def __init__(self, parent=None):
         super(loginWindow, self).__init__(parent)
         self.setupUi(self)
@@ -130,7 +132,6 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
         self.userInfoSignal.emit(resultInfo)
 
-
     def recvExit(self):
         self.alive = False
         self.client.close()  # 断开连接
@@ -140,17 +141,22 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def check(self):
         self.user = self.userLine.text()
         self.password = self.passwordLine.text()
-        userinfo = 'log' + ' ' + self.user + ' ' + self.password
-        print(userinfo)
+
         if self.user == "":
             errorInfo = QMessageBox.critical(self, "格式错误", "用户名不能为空！")
         elif self.password == "":
             errorInfo = QMessageBox.critical(self, "格式错误", "密码不能为空！")
         else:
-
+            # json格式封装用户信息
+            userInfo = {
+                'cmd': "log",
+                'username': self.user,
+                'psw': self.password
+            }
+            userInfoJson = json.dumps(userInfo)
             print("客户端开始发送登录指令和用户名密码")
 
-            self.client.send(userinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
+            self.client.send(userInfoJson.encode("UTF-8"))  # 客户端传递指令、用户名、密码
 
             reply = self.client.recv(buf)  # 接收服务器的回复
             reply = reply.decode(encoding='UTF-8')
@@ -167,11 +173,16 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
     # 向服务器发送注册输入的账号密码，检查是否已经有注册的了，如果没有，把账号密码添加进数据库。
     def check2(self, regiUsertext, regiPasswordtext):
-
-        regiuserinfo = 'regi' + ' ' + regiUsertext + ' ' + regiPasswordtext
-        print(regiuserinfo)
+        # json格式封装注册信息
+        regiInfo = {
+            'cmd': "regi",
+            'username': regiUsertext,
+            'psw': regiPasswordtext
+        }
+        regiInfoJson = json.dumps(regiInfo)
         print("客户端开始发送注册指令和用户名密码")
-        self.client.send(regiuserinfo.encode("UTF-8"))  # 客户端传递指令、用户名、密码
+        self.client.send(regiInfoJson.encode("UTF-8"))  # 客户端传递指令、用户名、密码
+
         reply = self.client.recv(buf)  # 接收服务器的回复
         reply = reply.decode(encoding='UTF-8')
         print(reply)
