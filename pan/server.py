@@ -150,10 +150,10 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入成功")
             flag = True
-            conn.send("1".encode("UTF-8"))
+            # conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            conn.send("-1".encode("UTF-8"))
+            # conn.send("-1".encode("UTF-8"))
             print("插入失败")
     print(flag)
     if flag == True:
@@ -164,10 +164,10 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入设备信息表成功")
             flag = True
-            conn.send("1".encode("UTF-8"))
+            # conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            conn.send("-1".encode("UTF-8"))
+            # conn.send("-1".encode("UTF-8"))
             print("插入设备信息表失败")
 
     return None
@@ -189,10 +189,10 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
         cursor.execute(sql, val)
         db.commit()
         print("插入资源信息成功")
-        conn.send("1".encode("UTF-8"))
+        # conn.send("1".encode("UTF-8"))
     except ValueError as e:
         print("--->", e)
-        conn.send("-1".encode("UTF-8"))
+        # conn.send("-1".encode("UTF-8"))
         print("插入资源信息失败")
     return None
 
@@ -223,12 +223,13 @@ def dealLs(conn, addr, user):
             wholeInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
 
         wholeInfo = wholeInfo[:-3]  # 去掉结尾多出来的三个#
+        wholeInfo = "fl&&&"+wholeInfo  # 消息前缀
         conn.send(wholeInfo.encode("UTF-8"))
         print(wholeInfo)
         return None
     else:
         print("NULL")
-        conn.send("NULL".encode("UTF-8"))
+        conn.send("fl&&&NULL".encode("UTF-8"))  # 加上消息前缀 再加NULL
         return None
 
 
@@ -256,12 +257,13 @@ def dealSc(conn, addr, user, fname):
             hasFileInfo += replyInfo + '***'  # 每个文件信息之间用三个#分割
 
         hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#
+        hasFileInfo = "ul&&&"+hasFileInfo  # 添加消息前缀
         conn.send(hasFileInfo.encode("UTF-8"))
         print(hasFileInfo)
         return None
     else:
         print("NULL")
-        conn.send("NULL".encode("UTF-8"))
+        conn.send("ul&&&NULL".encode("UTF-8")) # 添加消息前缀
         return None
 
 
@@ -300,10 +302,10 @@ def dealLogin(conn, addr, username, psw):
                 cursor.execute(sql1)
                 db.commit()
                 print("更新设备信息列表成功")
-                conn.send("1".encode("UTF-8"))
+                # conn.send("1".encode("UTF-8"))
             except ValueError as e:
                 print("--->", e)
-                conn.send("-1".encode("UTF-8"))
+                # conn.send("-1".encode("UTF-8"))
                 print("更新设备信息列表失败")
             return username
         else:
