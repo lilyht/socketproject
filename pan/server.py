@@ -5,8 +5,8 @@ import datetime
 import json
 # -*- coding: UTF-8 -*-
 
-serverIP = '127.0.0.1'
-# serverIP = '0.0.0.0'
+# serverIP = '127.0.0.1'
+serverIP = '0.0.0.0'
 serverPort = 12000
 
 maxN = 5  # 最大连接数
@@ -17,9 +17,15 @@ serverSocket.bind((serverIP, serverPort))
 # 最大连接数
 serverSocket.listen(maxN)
 
+global gloUser
+gloUser = ""
+global gloPath
+gloPath = ""
+
 
 # 收发数据
 def dealConn(conn, addr):
+    global gloUser
     # 获取客户发送的指令，如果登录成功则跳出循环
     serverSocket.settimeout(None)
     while True:
@@ -40,10 +46,16 @@ def dealConn(conn, addr):
                 if user != "":
                     print("登录成功！")
                     starttime = datetime.datetime.now()
+                    currentUser = user
+                    # t = threading.Thread(target=checkUser, args=currentUser)
+                    # t.start()
                     break
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
+        if currentUser == gloUser:
+            print(currentUser, " 收到文件传输请求")
+            gloUser = ""
         try:
             serverSocket.settimeout(5)  # 网络故障时，会收不到消息，于是设置超时
             data = conn.recv(1024)
@@ -64,17 +76,18 @@ def dealConn(conn, addr):
                     dealCl(conn, addr, user, filepath, filename, md5, finfo)
                 if cmd == "ls":
                     dealLs(conn, addr, user)
-                if cmd == "que":
-                    dealQue(conn, addr, user)
                 if cmd == "sc":
                     # 客户端传来 "sc" + "资源名"
                     fname = dstr[1]
                     dealSc(conn, addr, user, fname)
-
                 if cmd == "kc":
                     kcInfo = dstr[1]
                     # if kcInfo != "":
                     print("msg from client {} : {}".format(addr, kcInfo))
+                if cmd == "qf":
+                    fid = dstr[1]
+                    user = dstr[2]
+                    dealQf(conn, addr, fid, user)
         except:
             # 消息超时
             break
@@ -252,14 +265,6 @@ def dealSc(conn, addr, user, fname):
         return None
 
 
-def dealQue(conn, addr, user):
-    return None
-
-
-def dealTr(conn, addr, user):
-    return None
-
-
 def dealLogin(conn, addr, username, psw):
     # 是否在线
     # print(username, psw)
@@ -306,6 +311,32 @@ def dealLogin(conn, addr, username, psw):
             # print("输入的psw:{}".format(psw))
             conn.send("0".encode("UTF-8"))
             return ""
+
+
+def dealQf(conn, addr, fid, user):
+    global gloUser
+    global gloPath
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+    sql = "select distinct r.user, r.fpath from deviceinfo as d, resourceinfo as r where r.id = '{}' and r.user = '{}' and r.user = d.user and d.status = 1".format(fid, user)
+    cursor.execute(sql)
+    res = cursor.fetchone()
+    # 需要判断列表是否为空
+    if res is None:
+        # conn.send("-1".encode("UTF-8"))
+        print("ERROR")
+        return ""
+    else:
+        gloUser = res[0]
+        gloPath = res[1]
+        print("全局变量golUser、golPath已赋值")
+        print(gloPath)
+
+    return None
 
 
 def main():

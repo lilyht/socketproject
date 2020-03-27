@@ -14,6 +14,7 @@ class panWindow(QMainWindow, Ui_panWindow):
     clareSignal = pyqtSignal(str)  # 资源声明信号
     listSignal = pyqtSignal(str)  # 显示文件列表信号
     searchSignal = pyqtSignal(str)  # 搜索资源持有者信号
+    querySignal = pyqtSignal(str, str)  # 资源请求信号（ID, user）
 
     def __init__(self, parent=None):
         super(panWindow, self).__init__(parent)
@@ -37,6 +38,7 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.declareButton.clicked.connect(self.getLocalFile)
         self.showButton.clicked.connect(self.showList)
         self.searchButton.clicked.connect(self.searchUserByFilename)
+        self.queryButton.clicked.connect(self.queryFile)
 
     # 点击资源声明后打开本地文件夹并获取路径，并经过client发送到服务器插入
     def getLocalFile(self):
@@ -99,7 +101,7 @@ class panWindow(QMainWindow, Ui_panWindow):
 
     # 收到user信息
     def recvUserInfo(self, userInfo):
-        print("收到user信息")
+        # print("收到user信息")
         if userInfo[0] != "NULL":
             # 在表中显示结果
             row = 0
@@ -116,6 +118,12 @@ class panWindow(QMainWindow, Ui_panWindow):
         else:
             print("无数据可显示")
             errorInfo = QMessageBox.critical(self, "消息", "无数据可显示！")
+
+    # 请求文件
+    def queryFile(self):
+        destId = self.queryIdLine.text()
+        destUser = self.queryUserLine.text()
+        self.querySignal.emit(destId, destUser)
 
     def shutdown(self):
         self.exitSignal.emit("-9")

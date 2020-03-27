@@ -12,6 +12,7 @@ import threading
 import json
 
 serverIP = '127.0.0.1'
+# serverIP = '172.28.161.66'
 # serverIP = '172.28.179.111'
 serverPort = 12000
 buf = 2048
@@ -94,6 +95,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.exitSignal.connect(self.recvExit)  # 接收到网盘界面的退出
         self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
         self.w3.searchSignal.connect(self.recvSearchUser)  # 接收到网盘搜索资源持有者
+        self.w3.querySignal.connect(self.recvQueryFile)  # 接收到网盘请求获取资源
 
     # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
@@ -131,6 +133,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         resultInfo = resultInfo.split("***")
 
         self.userInfoSignal.emit(resultInfo)
+
+    def recvQueryFile(self, fileId, username):
+        queryInfo = "qf" + ' ' + fileId + ' ' + username
+        self.client.send(queryInfo.encode("UTF-8"))
 
     def recvExit(self):
         self.alive = False
