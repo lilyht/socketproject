@@ -68,24 +68,23 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         # 退出程序
         self.exitButton.clicked.connect(self.recvExit)
 
-
     def dealConn(self):
-            while True:
-                # time.sleep(3)
-                data = self.client.recv(buf)
-                datastr = data.decode(encoding='UTF-8')  # type: 'str'
-                if datastr != "":
-                    dstr = datastr.split('&&&')
-                    cmd = dstr[0]
-                    if cmd == "fl":  # 文件列表
-                        fileList = dstr[1]
-                        self.dealFileList(fileList)
-                    if cmd == "ul":  # 用户列表
-                        userList = dstr[1]
-                        self.dealUserList(userList)
-                    if cmd == "up":
-                        filePath = dstr[1]
-                        self.dealUpload(filePath)
+        while True:
+            # time.sleep(3)
+            data = self.client.recv(buf)
+            datastr = data.decode(encoding='UTF-8')  # type: 'str'
+            if datastr != "":
+                dstr = datastr.split('&&&')
+                cmd = dstr[0]
+                if cmd == "fl":  # 文件列表
+                    fileList = dstr[1]
+                    self.dealFileList(fileList)
+                if cmd == "ul":  # 用户列表
+                    userList = dstr[1]
+                    self.dealUserList(userList)
+                if cmd == "up":
+                    filePath = dstr[1]
+                    self.dealUpload(filePath)
 
     # 发送心跳包
     def sendHeartbeat(self):
@@ -116,8 +115,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
         self.w3.exitSignal.connect(self.recvExit)  # 接收到网盘界面的退出
         self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
-        self.w3.searchSignal.connect(self.recvSearchUser)  # 接收到网盘搜索资源持有者
-        self.w3.querySignal.connect(self.recvQueryFile)  # 接收到网盘请求获取资源
+        self.w3.searchSignal.connect(self.recvPanSearchUser)  # 接收到网盘搜索资源持有者
+        self.w3.querySignal.connect(self.recvPanQueryFile)  # 接收到网盘请求获取资源
 
     # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
@@ -234,7 +233,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.client.send(("alUp" + " " + filetotal_size + " " + file_name).encode("UTF-8"))
         send_size = 0
         print("filetotal_size: {}, file_name:{}".format(filetotal_size, file_name))
-        f= open(filePath,'rb')
+        f= open(filePath, 'rb')
         Flag = True
         while Flag:
             if send_size + 1024 >= filetotal_size:
@@ -242,9 +241,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                 Flag = False
             else:
                 data = f.read(1024)
-                send_size+=1024
-            self.client.send(data.encode("UTF-8"))
+                send_size += 1024
+            self.client.send(data)
         f.close()
+
 
 if __name__ == '__main__':
     main()
