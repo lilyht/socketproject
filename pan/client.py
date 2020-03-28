@@ -10,6 +10,7 @@ from socket import *
 import time
 import threading
 import json
+import os
 
 serverIP = '127.0.0.1'
 # serverIP = '172.28.161.66'
@@ -67,20 +68,24 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         # 退出程序
         self.exitButton.clicked.connect(self.recvExit)
 
+
     def dealConn(self):
-        while True:
-            # time.sleep(3)
-            data = self.client.recv(buf)
-            datastr = data.decode(encoding='UTF-8')  # type: 'str'
-            if datastr != "":
-                dstr = datastr.split('&&&')
-                cmd = dstr[0]
-                if cmd == "fl":  # 文件列表
-                    fileList = dstr[1]
-                    self.dealFileList(fileList)
-                if cmd == "ul":  # 用户列表
-                    userList = dstr[1]
-                    self.dealUserList(userList)
+            while True:
+                # time.sleep(3)
+                data = self.client.recv(buf)
+                datastr = data.decode(encoding='UTF-8')  # type: 'str'
+                if datastr != "":
+                    dstr = datastr.split('&&&')
+                    cmd = dstr[0]
+                    if cmd == "fl":  # 文件列表
+                        fileList = dstr[1]
+                        self.dealFileList(fileList)
+                    if cmd == "ul":  # 用户列表
+                        userList = dstr[1]
+                        self.dealUserList(userList)
+                    if cmd == "up":
+                        filePath = dstr[1]
+                        self.dealUpload(filePath)
 
     # 发送心跳包
     def sendHeartbeat(self):
@@ -141,7 +146,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.fileInfoSignal.emit(fileList)
 
     # 接收到网盘界面搜索资源持有者
-    def recvSearchUser(self, filename):
+    def recvPanSearchUser(self, filename):
         searchInfo = "sc" + ' ' + filename
         print("搜索资源：", filename)
         # time.sleep(1)
@@ -154,7 +159,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
         self.userInfoSignal.emit(userList)
 
-    def recvQueryFile(self, fileId, username):
+    def recvPanQueryFile(self, fileId, username):
         queryInfo = "qf" + ' ' + fileId + ' ' + username
         self.client.send(queryInfo.encode("UTF-8"))
 
@@ -221,6 +226,25 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         else:
             regiInfo = QMessageBox.critical(self, "注册反馈", "出现未知错误！")
 
+    def dealUpload(self, filePath):
+        # 上传文件大小
+        filetotal_size = os.path.getsize(filePath)
+        # 上传文件名称
+        file_name = os.path.basename(filePath)
+        self.client.send(("alUp" + " " + filetotal_size + " " + file_name).encode("UTF-8"))
+        send_size = 0
+        print("filetotal_size: {}, file_name:{}".format(filetotal_size, file_name))
+        f= open(filePath,'rb')
+        Flag = True
+        while Flag:
+            if send_size + 1024 >= filetotal_size:
+                data = f.read(filetotal_size - send_size)
+                Flag = False
+            else:
+                data = f.read(1024)
+                send_size+=1024
+            self.client.send(data.encode("UTF-8"))
+        f.close()
 
 if __name__ == '__main__':
     main()
