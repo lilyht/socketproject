@@ -17,15 +17,25 @@ serverSocket.bind((serverIP, serverPort))
 # 最大连接数
 serverSocket.listen(maxN)
 
-global gloUser
-gloUser = ""
-global gloPath
+global gloDestUser  # 被请求的用户
+global gloPath  # 资源的绝对路径
+global gloSrcUser  # 发送请求的用户
+global gloLocalPath  # 服务器缓存在本地的路径
+global gloSignal  # 用于表示文件已经上传
+gloDestUser = ""
 gloPath = ""
+gloSrcUser = ""
+gloLocalPath = ""
+gloSignal = ""
 
 
 # 收发数据
 def dealConn(conn, addr):
-    global gloUser
+    global gloDestUser
+    global gloPath
+    global gloLocalPath
+    global gloSrcUser
+    global gloSignal
     # 获取客户发送的指令，如果登录成功则跳出循环
     serverSocket.settimeout(None)
     while True:
@@ -46,16 +56,27 @@ def dealConn(conn, addr):
                 if user != "":
                     print("登录成功！")
                     starttime = datetime.datetime.now()
-                    currentUser = user
-                    # t = threading.Thread(target=checkUser, args=currentUser)
-                    # t.start()
+                    currentUser = user  # 设置该线程服务的用户名
                     break
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
-        if currentUser == gloUser:
+        # 目标方对应的server线程，发现有人想向它现在的客户请求资源
+        if currentUser == gloDestUser:
             print(currentUser, " 收到文件传输请求")
-            gloUser = ""
+            gloDestUser = ""  # 清空全局变量，防止重复响应
+            pathMsg = "up&&&" + gloPath
+            conn.send(pathMsg.encode("UTF-8"))  # 请求目标客户端上传文件
+            gloPath = ""  # 清空全局变量，防止重复响应
+
+        # 请求方对应的server线程，并且发送方的server已经缓存好了
+        if currentUser == gloSrcUser and gloSignal == "OK":
+            localPath = gloLocalPath
+            gloLocalPath = ""  # 清空全局变量，防止重复响应
+            gloSignal = ""  # 清空全局变量，防止重复响应
+            gloSrcUser = ""  # 清空全局变量，防止重复响应
+            dealDf(conn, addr, localPath)  # download file 给请求者发送文件
+
         try:
             serverSocket.settimeout(5)  # 网络故障时，会收不到消息，于是设置超时
             data = conn.recv(1024)
@@ -68,26 +89,40 @@ def dealConn(conn, addr):
                 cmd = dstr[0]
 
                 print('Server received command: %s' % cmd)
-                if cmd == "cl":
+                if cmd == "cl":  # 资源声明
                     filepath = dstr[1]
                     filename = dstr[2]
                     md5 = dstr[3]
                     finfo = dstr[4]
                     dealCl(conn, addr, user, filepath, filename, md5, finfo)
-                if cmd == "ls":
+                if cmd == "ls":  # 显示资源列表
                     dealLs(conn, addr, user)
-                if cmd == "sc":
+                if cmd == "sc":  # 客户端搜索资源
                     # 客户端传来 "sc" + "资源名"
                     fname = dstr[1]
                     dealSc(conn, addr, user, fname)
-                if cmd == "kc":
+                if cmd == "kc":  # 心跳函数
                     kcInfo = dstr[1]
                     # if kcInfo != "":
                     print("msg from client {} : {}".format(addr, kcInfo))
-                if cmd == "qf":
+                if cmd == "qf":  # 客户请求文件
                     fid = dstr[1]
                     user = dstr[2]
                     dealQf(conn, addr, fid, user)
+                if cmd == "alup":  # 接收目标方的文件，并缓存到本地
+                    total_size = dstr[1]  # 文件总大小
+                    filename = dstr[2]  # 文件名
+                    with open('./temp/%s/%s' % (currentUser, filename), 'wb') as f:
+                        recv_size = 0
+                        while recv_size < total_size:
+                            res = conn.recv(1024)
+                            f.write(res)
+                            recv_size += len(res)
+                            print('总大小：%s  已经下载大小：%s' % (total_size, recv_size))
+
+                    gloLocalPath = "./temp/"+currentUser+'/'+filename
+                    gloSignal = "OK"
+
         except:
             # 消息超时
             break
@@ -150,10 +185,10 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入成功")
             flag = True
-            conn.send("1".encode("UTF-8"))
+            # conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            conn.send("-1".encode("UTF-8"))
+            # conn.send("-1".encode("UTF-8"))
             print("插入失败")
     print(flag)
     if flag == True:
@@ -164,10 +199,10 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入设备信息表成功")
             flag = True
-            conn.send("1".encode("UTF-8"))
+            # conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            conn.send("-1".encode("UTF-8"))
+            # conn.send("-1".encode("UTF-8"))
             print("插入设备信息表失败")
 
     return None
@@ -189,10 +224,10 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
         cursor.execute(sql, val)
         db.commit()
         print("插入资源信息成功")
-        conn.send("1".encode("UTF-8"))
+        # conn.send("1".encode("UTF-8"))
     except ValueError as e:
         print("--->", e)
-        conn.send("-1".encode("UTF-8"))
+        # conn.send("-1".encode("UTF-8"))
         print("插入资源信息失败")
     return None
 
@@ -223,12 +258,13 @@ def dealLs(conn, addr, user):
             wholeInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
 
         wholeInfo = wholeInfo[:-3]  # 去掉结尾多出来的三个#
+        wholeInfo = "fl&&&"+wholeInfo  # 消息前缀
         conn.send(wholeInfo.encode("UTF-8"))
         print(wholeInfo)
         return None
     else:
         print("NULL")
-        conn.send("NULL".encode("UTF-8"))
+        conn.send("fl&&&NULL".encode("UTF-8"))  # 加上消息前缀 再加NULL
         return None
 
 
@@ -256,12 +292,13 @@ def dealSc(conn, addr, user, fname):
             hasFileInfo += replyInfo + '***'  # 每个文件信息之间用三个#分割
 
         hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#
+        hasFileInfo = "ul&&&"+hasFileInfo  # 添加消息前缀
         conn.send(hasFileInfo.encode("UTF-8"))
         print(hasFileInfo)
         return None
     else:
         print("NULL")
-        conn.send("NULL".encode("UTF-8"))
+        conn.send("ul&&&NULL".encode("UTF-8")) # 添加消息前缀
         return None
 
 
@@ -300,10 +337,10 @@ def dealLogin(conn, addr, username, psw):
                 cursor.execute(sql1)
                 db.commit()
                 print("更新设备信息列表成功")
-                conn.send("1".encode("UTF-8"))
+                # conn.send("1".encode("UTF-8"))
             except ValueError as e:
                 print("--->", e)
-                conn.send("-1".encode("UTF-8"))
+                # conn.send("-1".encode("UTF-8"))
                 print("更新设备信息列表失败")
             return username
         else:
@@ -313,9 +350,15 @@ def dealLogin(conn, addr, username, psw):
             return ""
 
 
+# 服务器给请求方传送文件
+def dealDf(conn, addr, localPath):
+    return None
+
+
 def dealQf(conn, addr, fid, user):
-    global gloUser
+    global gloDestUser
     global gloPath
+    global gloSrcUser
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     cursor = db.cursor()
     try:
@@ -329,12 +372,13 @@ def dealQf(conn, addr, fid, user):
     if res is None:
         # conn.send("-1".encode("UTF-8"))
         print("ERROR")
-        return ""
+        return None
     else:
-        gloUser = res[0]
+        # 赋值全局请求者、目的人、目标路径
+        gloDestUser = res[0]
         gloPath = res[1]
-        print("全局变量golUser、golPath已赋值")
-        print(gloPath)
+        gloSrcUser = user
+        print("全局变量gloDestUser, gloPath, gloSrcUser已赋值")
 
     return None
 
