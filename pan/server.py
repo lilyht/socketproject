@@ -296,8 +296,7 @@ def dealSc(conn, addr, user, fname):
     except:
         print("Error: unable to use database!")
         # 使用execute方法执行SQL语句，查询密码是否匹配
-    # sql = "SELECT * FROM Resourceinfo WHERE user = '%s'" % user
-    sql = "select r.ID, r.fpath, d.user, d.IP, d.port from resourceinfo r, deviceinfo d where r.fname='%s' and r.user=d.user" % fname
+    sql = "select r.ID, r.fpath, d.user, d.IP, d.port from resourceinfo r, deviceinfo d where r.fname='%s' and r.user=d.user and d.status=1" % fname
     hasFileInfo = ""
 
 
@@ -373,6 +372,27 @@ def dealLogin(conn, addr, username, psw):
 # 服务器给请求方传送文件
 def dealDf(conn, addr, localPath):
     print("准备发给请求方")
+    downloadfilesize = os.path.getsize(localPath)
+    downloadfilename = os.path.basename(localPath)
+    info = "Dl" + " " + str(downloadfilesize) + " " + downloadfilename
+    conn.send(info.encode("UTF-8"))
+    time.sleep(2)
+    send_size = 0
+    print("downloadfilesize: {}, downloadfilename:{}".format(downloadfilesize, downloadfilename))
+    f = open(localPath, 'rb')
+    Flag = True
+    while Flag:
+        if send_size + 1024 >= downloadfilesize:
+            data = f.read(downloadfilesize - send_size)
+            Flag = False
+        else:
+            data = f.read(1024)
+            send_size += 1024
+        conn.send(data)
+    f.close()
+    print("文件已发送至客户端")
+    # 需要清空全局变量吗？
+
     return None
 
 
