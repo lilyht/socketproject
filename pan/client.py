@@ -11,6 +11,7 @@ import time
 import threading
 import json
 import os
+import hashlib
 
 serverIP = '127.0.0.1'
 # serverIP = '172.28.161.66'
@@ -90,6 +91,28 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                         filePath = dstr[1]
                         print("准备上传文件")
                         self.dealUpload(filePath)
+                    if cmd == "Dl":  # 从服务器下载文件
+                        self.client.setblocking(True)
+                        time.sleep(5)
+                        print(dstr)
+                        print("准备下载文件")
+                        total_size = dstr[1]  # 文件总大小
+                        total_size = int(total_size)
+                        print(total_size)
+                        filename = dstr[2]  # 文件名
+                        print(filename)
+                        if not os.path.exists('./%s' % self.user):
+                            os.makedirs('./%s' % self.user)
+                        with open('./%s/%s' % (self.user, filename), 'wb') as f:
+                            print("开始下载文件")
+                            recv_size = 0
+                            while recv_size < total_size:
+                                res = self.client.recv(1024)
+                                f.write(res)
+                                recv_size += len(res)
+                                print('总大小：%s  已经下载大小：%s' % (total_size, recv_size))
+                        print("下载完成")
+
             except (BlockingIOError, ConnectionResetError):
                 pass
 
@@ -173,6 +196,21 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.alive = False
         self.client.close()  # 断开连接
         self.close()  # 退出程序
+
+    def afterDownload(self, localPath):
+        absPath = localPath
+        temp = absPath.split('/')
+        filename = temp[-1]
+
+        m = hashlib.md5()  # 声明一个md5库
+        file = open(absPath, 'rb')  # 用二进制读取文件
+        m.update(file.read())  # 编码
+        file.close()
+        file_md5 = m.hexdigest()  # 生成md5码
+        # print(file_md5)
+
+        fileInfo = absPath + " " + filename + " " + file_md5 + " " + "NULL"  # 注释为NULL的文件信息
+        self.recvPanClare(fileInfo)
 
     # 向服务器发送登录输入的账号密码，检查是否正确，如果正确则跳转界面，否则提示错误
     def check(self):

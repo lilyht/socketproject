@@ -374,7 +374,7 @@ def dealDf(conn, addr, localPath):
     print("准备发给请求方")
     downloadfilesize = os.path.getsize(localPath)
     downloadfilename = os.path.basename(localPath)
-    info = "Dl" + " " + str(downloadfilesize) + " " + downloadfilename
+    info = "Dl" + "&&&" + str(downloadfilesize) + "&&&" + downloadfilename
     conn.send(info.encode("UTF-8"))
     time.sleep(2)
     send_size = 0
@@ -391,7 +391,11 @@ def dealDf(conn, addr, localPath):
         conn.send(data)
     f.close()
     print("文件已发送至客户端")
-    # 需要清空全局变量吗？
+
+    try:
+        os.remove(localPath)  # 删除本地缓存
+    except OSError as e:
+        print(e)
 
     return None
 
