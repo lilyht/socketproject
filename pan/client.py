@@ -42,12 +42,12 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.regiUser = ""
         self.regiPassword = ""
         self.client = socket(AF_INET, SOCK_STREAM)
-        self.client.settimeout(10)  # 设置连接超时
+        # self.client.settimeout()  # 设置连接超时
         # time.sleep(2)
         # SOL_SOCKET: 65535  SO_KEEPALIVE: 8
         # self.client.settimeout(100)
         self.alive = True
-
+        self.heart = threading.Thread(target=self.sendHeartbeat, args=())
         self.client.setsockopt(SOL_SOCKET, SO_KEEPALIVE, 1)  # 在客户端开启心跳维护
         self.client.connect((serverIP, serverPort))
 
@@ -71,20 +71,27 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def dealConn(self):
         while True:
             # time.sleep(3)
-            data = self.client.recv(buf)
-            datastr = data.decode(encoding='UTF-8')  # type: 'str'
-            if datastr != "":
-                dstr = datastr.split('&&&')
-                cmd = dstr[0]
-                if cmd == "fl":  # 文件列表
-                    fileList = dstr[1]
-                    self.dealFileList(fileList)
-                if cmd == "ul":  # 用户列表
-                    userList = dstr[1]
-                    self.dealUserList(userList)
-                if cmd == "up":
-                    filePath = dstr[1]
-                    self.dealUpload(filePath)
+            self.client.setblocking(False)
+            try:
+                data = self.client.recv(buf)
+                datastr = data.decode(encoding='UTF-8')  # type: 'str'
+                if datastr != "":
+                    dstr = datastr.split('&&&')
+                    cmd = dstr[0]
+                    print("客户端收到命令：", cmd)
+                    if cmd == "fl":  # 文件列表
+                        fileList = dstr[1]
+                        self.dealFileList(fileList)
+                    if cmd == "ul":  # 用户列表
+                        userList = dstr[1]
+                        self.dealUserList(userList)
+                    if cmd == "up":
+                        # self.heart.join()
+                        filePath = dstr[1]
+                        print("准备上传文件")
+                        self.dealUpload(filePath)
+            except (BlockingIOError, ConnectionResetError):
+                pass
 
     # 发送心跳包
     def sendHeartbeat(self):
@@ -103,13 +110,13 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
     # 登录成功后的响应
     def pan(self, user):
-        heart = threading.Thread(target=self.sendHeartbeat, args=())
+
         recvServer = threading.Thread(target=self.dealConn, args=())
         self.w3.show()  # 网盘界面弹出
         self.w3.user = user
         self.w3.usernameLine.setText(user)
 
-        heart.start()
+        # self.heart.start()
         recvServer.start()
 
         self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
@@ -230,10 +237,12 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         filetotal_size = os.path.getsize(filePath)
         # 上传文件名称
         file_name = os.path.basename(filePath)
-        self.client.send(("alUp" + " " + filetotal_size + " " + file_name).encode("UTF-8"))
+        info = "alUp" + " " + str(filetotal_size) + " " + file_name
+        self.client.send(info.encode("UTF-8"))
+        time.sleep(2)
         send_size = 0
         print("filetotal_size: {}, file_name:{}".format(filetotal_size, file_name))
-        f= open(filePath, 'rb')
+        f = open(filePath, 'rb')
         Flag = True
         while Flag:
             if send_size + 1024 >= filetotal_size:
@@ -244,6 +253,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                 send_size += 1024
             self.client.send(data)
         f.close()
+        print("文件已上传")
 
 
 if __name__ == '__main__':

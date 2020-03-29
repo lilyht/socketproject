@@ -3,6 +3,8 @@ import MySQLdb
 import threading
 import datetime
 import json
+import time
+import os
 # -*- coding: UTF-8 -*-
 
 # serverIP = '127.0.0.1'
@@ -47,7 +49,6 @@ def dealConn(conn, addr):
             cmd = dataContent['cmd']
             username = dataContent['username']
             psw = dataContent['psw']
-
             if cmd == "regi":
                 dealRegi(conn, addr, username, psw)
             if cmd == "log":
@@ -61,16 +62,20 @@ def dealConn(conn, addr):
 
     # GUI中登录之后会进入文件面板（网盘主面板），不会再回退到登陆界面。
     while True:
+        conn.setblocking(False)
+        # print(currentUser)
         # 目标方对应的server线程，发现有人想向它现在的客户请求资源
         if currentUser == gloDestUser:
-            print(currentUser, " 收到文件传输请求")
+            print(currentUser, "收到文件传输请求")
             gloDestUser = ""  # 清空全局变量，防止重复响应
             pathMsg = "up&&&" + gloPath
+            print("准备发送上传请求：", pathMsg)
             conn.send(pathMsg.encode("UTF-8"))  # 请求目标客户端上传文件
             gloPath = ""  # 清空全局变量，防止重复响应
 
         # 请求方对应的server线程，并且发送方的server已经缓存好了
         if currentUser == gloSrcUser and gloSignal == "OK":
+            print("本地已缓存")
             localPath = gloLocalPath
             gloLocalPath = ""  # 清空全局变量，防止重复响应
             gloSignal = ""  # 清空全局变量，防止重复响应
@@ -78,8 +83,9 @@ def dealConn(conn, addr):
             dealDf(conn, addr, localPath)  # download file 给请求者发送文件
 
         try:
-            serverSocket.settimeout(5)  # 网络故障时，会收不到消息，于是设置超时
+            # serverSocket.settimeout(5)  # 网络故障时，会收不到消息，于是设置超时
             data = conn.recv(1024)
+            conn.setblocking(True)
             if not data:  # 连接关闭时会导致持续接收空消息
                 break
             datastr = data.decode(encoding='UTF-8')  # type: 'str'
@@ -104,15 +110,25 @@ def dealConn(conn, addr):
                 if cmd == "kc":  # 心跳函数
                     kcInfo = dstr[1]
                     # if kcInfo != "":
-                    print("msg from client {} : {}".format(addr, kcInfo))
+                    # print("msg from client {} : {}".format(addr, kcInfo))
                 if cmd == "qf":  # 客户请求文件
                     fid = dstr[1]
                     user = dstr[2]
-                    dealQf(conn, addr, fid, user)
-                if cmd == "alup":  # 接收目标方的文件，并缓存到本地
+                    dealQf(conn, addr, fid, user, currentUser)
+                if cmd == "alUp":  # 接收目标方的文件，并缓存到本地
+                    time.sleep(5)
+                    print(dstr)
+
+                    print("准备接收文件")
                     total_size = dstr[1]  # 文件总大小
+                    total_size = int(total_size)
+                    print(total_size)
                     filename = dstr[2]  # 文件名
+                    print(filename)
+                    if not os.path.exists('./temp/%s' % currentUser):
+                        os.makedirs('./temp/%s' % currentUser)
                     with open('./temp/%s/%s' % (currentUser, filename), 'wb') as f:
+                        print("正在接收文件")
                         recv_size = 0
                         while recv_size < total_size:
                             res = conn.recv(1024)
@@ -121,10 +137,14 @@ def dealConn(conn, addr):
                             print('总大小：%s  已经下载大小：%s' % (total_size, recv_size))
 
                     gloLocalPath = "./temp/"+currentUser+'/'+filename
+                    print(gloLocalPath)
                     gloSignal = "OK"
-
-        except:
+        except (BlockingIOError, ConnectionResetError):
+            pass
+        except ValueError as e:
             # 消息超时
+            print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            print(e)
             break
 
     # 无论收到空消息还是没收到消息，都打破循环跳转到这里
@@ -249,18 +269,18 @@ def dealLs(conn, addr, user):
 
     cursor.execute(sql)
     res = cursor.fetchall()
-    print(res)
+    # print(res)
     if len(res):
         for one in res:
             # print(one)
             replyInfo = one[0] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件名，绝对路径，备注
-            print(replyInfo)
+            # print(replyInfo)
             wholeInfo += replyInfo + '###'  # 每个文件信息之间用三个#分割
 
         wholeInfo = wholeInfo[:-3]  # 去掉结尾多出来的三个#
         wholeInfo = "fl&&&"+wholeInfo  # 消息前缀
         conn.send(wholeInfo.encode("UTF-8"))
-        print(wholeInfo)
+        # print(wholeInfo)
         return None
     else:
         print("NULL")
@@ -288,13 +308,13 @@ def dealSc(conn, addr, user, fname):
         for one in res:
             # print(one)
             replyInfo = one[0] + " " + one[1] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件路径，user, IP, 端口号
-            print(replyInfo)
+            # print(replyInfo)
             hasFileInfo += replyInfo + '***'  # 每个文件信息之间用三个#分割
 
         hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#
         hasFileInfo = "ul&&&"+hasFileInfo  # 添加消息前缀
         conn.send(hasFileInfo.encode("UTF-8"))
-        print(hasFileInfo)
+        # print(hasFileInfo)
         return None
     else:
         print("NULL")
@@ -352,10 +372,11 @@ def dealLogin(conn, addr, username, psw):
 
 # 服务器给请求方传送文件
 def dealDf(conn, addr, localPath):
+    print("准备发给请求方")
     return None
 
 
-def dealQf(conn, addr, fid, user):
+def dealQf(conn, addr, fid, user, currentUser):
     global gloDestUser
     global gloPath
     global gloSrcUser
@@ -377,8 +398,9 @@ def dealQf(conn, addr, fid, user):
         # 赋值全局请求者、目的人、目标路径
         gloDestUser = res[0]
         gloPath = res[1]
-        gloSrcUser = user
+        gloSrcUser = currentUser
         print("全局变量gloDestUser, gloPath, gloSrcUser已赋值")
+        print(gloDestUser, gloPath, gloSrcUser)
 
     return None
 
