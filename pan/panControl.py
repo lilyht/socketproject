@@ -30,6 +30,8 @@ class panWindow(QMainWindow, Ui_panWindow):
         # model2
         self.userModel = QStandardItemModel()  # 显示资源持有者列表的model
         self.userModel.setHorizontalHeaderLabels(['资源ID', '绝对路径', '用户名', 'IP地址', '端口号'])
+        # 一个空model，用于初始化
+        self.emptyModel = QStandardItemModel()  # 空的
 
         self.nw.noteSignal.connect(self.recvNoteAndSendAll)  # 接收备注文本
 
@@ -44,7 +46,7 @@ class panWindow(QMainWindow, Ui_panWindow):
     def getLocalFile(self):
         clarePath = QtWidgets.QFileDialog.getOpenFileName(self, "资源声明", "~")
         absPath = clarePath[0]  # 绝对路径
-        if absPath == '':
+        if absPath == '':  # 用户点击了取消
             return None
         temp = absPath.split('/')
         filename = temp[-1]
@@ -71,12 +73,19 @@ class panWindow(QMainWindow, Ui_panWindow):
 
     # 点击显示当前账号文件列表按钮响应
     def showList(self):
+        # 初始化
+        self.resultTable.setModel(self.emptyModel)
         self.listSignal.emit("")
 
     # 收到显示文件列表的反馈
     def recvFileInfo(self, wholeInfo):
         print("收到文件信息")
         print(wholeInfo)
+
+        # 初始化模型
+        self.myFileModel.clear()
+        self.myFileModel.setHorizontalHeaderLabels(['ID', '文件名', '绝对路径', '备注'])
+
         if wholeInfo[0] != "NULL":
             # 在表中显示结果
             row = 0
@@ -102,6 +111,10 @@ class panWindow(QMainWindow, Ui_panWindow):
     # 收到user信息
     def recvUserInfo(self, userInfo):
         # print("收到user信息")
+        # 初始化模型
+        self.userModel.clear()
+        self.userModel.setHorizontalHeaderLabels(['资源ID', '绝对路径', '用户名', 'IP地址', '端口号'])
+
         if userInfo[0] != "NULL":
             # 在表中显示结果
             row = 0
@@ -123,7 +136,16 @@ class panWindow(QMainWindow, Ui_panWindow):
     def queryFile(self):
         destId = self.queryIdLine.text()
         destUser = self.queryUserLine.text()
+        if destUser == self.user:
+            errInfo = QMessageBox.critical(self, "错误", "您不能向自己获取文件哦")
         self.querySignal.emit(destId, destUser)
+
+    # 接收资源反馈
+    def getFeedbackCl(self, feedback):
+        if feedback == "1":
+            okInfo = QMessageBox.information(self, "资源声明反馈", "声明成功！")
+        else:
+            error = QMessageBox.critical(self, "资源声明反馈", "出现未知错误，声明失败！")
 
     def shutdown(self):
         self.exitSignal.emit("-9")

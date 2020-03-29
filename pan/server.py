@@ -205,10 +205,10 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入成功")
             flag = True
-            # conn.send("1".encode("UTF-8"))
+            conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            # conn.send("-1".encode("UTF-8"))
+            conn.send("-1".encode("UTF-8"))
             print("插入失败")
     print(flag)
     if flag == True:
@@ -219,10 +219,8 @@ def dealRegi(conn, addr, username, psw):
             db.commit()
             print("插入设备信息表成功")
             flag = True
-            # conn.send("1".encode("UTF-8"))
         except ValueError as e:
             print("--->", e)
-            # conn.send("-1".encode("UTF-8"))
             print("插入设备信息表失败")
 
     return None
@@ -244,10 +242,10 @@ def dealCl(conn, addr, user, fpath, fname, ID, finfo):
         cursor.execute(sql, val)
         db.commit()
         print("插入资源信息成功")
-        # conn.send("1".encode("UTF-8"))
+        conn.send("feedbackCl&&&1".encode("UTF-8"))
     except ValueError as e:
         print("--->", e)
-        # conn.send("-1".encode("UTF-8"))
+        conn.send("feedbackCl&&&-1".encode("UTF-8"))
         print("插入资源信息失败")
     return None
 
@@ -307,7 +305,7 @@ def dealSc(conn, addr, user, fname):
         for one in res:
             # print(one)
             replyInfo = one[0] + " " + one[1] + " " + one[2] + " " + one[3] + " " + one[4]  # ID，文件路径，user, IP, 端口号
-            # print(replyInfo)
+            print(replyInfo)
             hasFileInfo += replyInfo + '***'  # 每个文件信息之间用三个#分割
 
         hasFileInfo = hasFileInfo[:-3]  # 去掉结尾多出来的三个#

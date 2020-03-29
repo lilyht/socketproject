@@ -32,6 +32,7 @@ def main():
 class loginWindow(QMainWindow, Ui_loginWindow):
     fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
     userInfoSignal = pyqtSignal(list)  # 回传user信息
+    feedbackClSignal = pyqtSignal(str)  # 资源声明消息反馈
 
     def __init__(self, parent=None):
         super(loginWindow, self).__init__(parent)
@@ -68,6 +69,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.userInfoSignal.connect(self.w3.recvUserInfo)
         # 退出程序
         self.exitButton.clicked.connect(self.recvExit)
+        # 资源声明消息反馈信号
+        self.feedbackClSignal.connect(self.w3.getFeedbackCl)
 
     def dealConn(self):
         while True:
@@ -80,13 +83,16 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                     dstr = datastr.split('&&&')
                     cmd = dstr[0]
                     print("客户端收到命令：", cmd)
+                    if cmd == "feedbackCl":  # 接收到服务器发来的资源声明反馈
+                        feedback = dstr[1]
+                        self.feedbackClSignal.emit(feedback)
                     if cmd == "fl":  # 文件列表
                         fileList = dstr[1]
                         self.dealFileList(fileList)
                     if cmd == "ul":  # 用户列表
                         userList = dstr[1]
                         self.dealUserList(userList)
-                    if cmd == "up":
+                    if cmd == "up":  # 上传文件到服务器
                         # self.heart.join()
                         filePath = dstr[1]
                         print("准备上传文件")
@@ -159,7 +165,6 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         clareInfo = 'cl' + ' ' + localFileInfo
         self.client.send(clareInfo.encode("UTF-8"))
         # print(clareInfo)
-        # waste = self.client.recv(buf)  # 接收冗余回复（插入资源信息表的反馈）
 
     # 接收网盘界面的显示文件列表消息
     def recvPanShowList(self):
