@@ -105,7 +105,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
                     if cmd == "Dl":  # 从服务器下载文件
                         self.client.setblocking(True)
-                        time.sleep(5)
+                        time.sleep(3)
                         print(dstr)
                         print("准备下载文件")
                         total_size = dstr[1]  # 文件总大小
@@ -124,7 +124,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                                 recv_size += len(res)
                                 print('总大小：%s  已经下载大小：%s' % (total_size, recv_size))
                         print("下载完成")
-                        self.afterDownload('./%s/%s' % (self.user, filename))
+                        self.afterDownload(os.path.abspath('./%s/%s' % (self.user, filename)))  # 获取绝对路径并声明资源
 
             except (BlockingIOError, ConnectionResetError):
                 pass
