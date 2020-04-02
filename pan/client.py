@@ -19,6 +19,8 @@ serverIP = '127.0.0.1'
 serverPort = 12000
 buf = 2048
 
+global allowHeart
+allowHeart = True
 
 def main():
     # 程序的开始，所有的窗口都由登陆界面（w1）衍生
@@ -73,6 +75,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.feedbackClSignal.connect(self.w3.getFeedbackCl)
 
     def dealConn(self):
+        global allowHeart
         while True:
             # time.sleep(3)
             self.client.setblocking(False)
@@ -93,10 +96,13 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                         userList = dstr[1]
                         self.dealUserList(userList)
                     if cmd == "up":  # 上传文件到服务器
-                        # self.heart.join()
+                        allowHeart = False  # 暂时关闭心跳函数
                         filePath = dstr[1]
                         print("准备上传文件")
                         self.dealUpload(filePath)
+                        time.sleep(5)
+                        allowHeart = True  # 重新开启心跳函数
+
                     if cmd == "Dl":  # 从服务器下载文件
                         self.client.setblocking(True)
                         time.sleep(5)
@@ -118,6 +124,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                                 recv_size += len(res)
                                 print('总大小：%s  已经下载大小：%s' % (total_size, recv_size))
                         print("下载完成")
+                        self.afterDownload('./%s/%s' % (self.user, filename))
 
             except (BlockingIOError, ConnectionResetError):
                 pass
@@ -125,10 +132,11 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     # 发送心跳包
     def sendHeartbeat(self):
         a = 0
-        while True:
+        while allowHeart:
             time.sleep(4)
             a += 1
-            keepconn = "kc 已连接"+str(a*4)+"秒"
+            # keepconn = "kc 已连接"+str(a*4)+"秒"
+            keepconn = "kc"
             # self.client.send(bytes(keepconn, 'UTF-8'))  # 向服务端发送消息
             self.client.send(keepconn.encode("UTF-8"))
 
@@ -145,7 +153,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.user = user
         self.w3.usernameLine.setText(user)
 
-        # self.heart.start()
+        self.heart.start()
         recvServer.start()
 
         self.w3.clareSignal.connect(self.recvPanClare)  # 接收到网盘界面的资源声明
@@ -194,6 +202,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.userInfoSignal.emit(userList)
 
     def recvPanQueryFile(self, fileId, username):
+        global allowHeart
+        allowHeart = False  # 暂时关闭心跳函数
         queryInfo = "qf" + ' ' + fileId + ' ' + username
         self.client.send(queryInfo.encode("UTF-8"))
 
@@ -203,6 +213,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.close()  # 退出程序
 
     def afterDownload(self, localPath):
+        global allowHeart
         absPath = localPath
         temp = absPath.split('/')
         filename = temp[-1]
@@ -216,6 +227,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
 
         fileInfo = absPath + " " + filename + " " + file_md5 + " " + "NULL"  # 注释为NULL的文件信息
         self.recvPanClare(fileInfo)
+        allowHeart = True  # 重新开启心跳函数
 
     # 向服务器发送登录输入的账号密码，检查是否正确，如果正确则跳转界面，否则提示错误
     def check(self):

@@ -96,6 +96,7 @@ def dealConn(conn, addr):
 
                 print('Server received command: %s' % cmd)
                 if cmd == "cl":  # 资源声明
+                    # print(dstr)
                     filepath = dstr[1]
                     filename = dstr[2]
                     md5 = dstr[3]
@@ -108,13 +109,14 @@ def dealConn(conn, addr):
                     fname = dstr[1]
                     dealSc(conn, addr, user, fname)
                 if cmd == "kc":  # 心跳函数
-                    kcInfo = dstr[1]
+                    # kcInfo = dstr[1]
+                    print("保持心跳")
                     # if kcInfo != "":
                     # print("msg from client {} : {}".format(addr, kcInfo))
                 if cmd == "qf":  # 客户请求文件
                     fid = dstr[1]
-                    user = dstr[2]
-                    dealQf(conn, addr, fid, user, currentUser)
+                    destUser = dstr[2]
+                    dealQf(conn, addr, fid, destUser, currentUser)
                 if cmd == "alUp":  # 接收目标方的文件，并缓存到本地
                     time.sleep(5)
                     print(dstr)
@@ -398,7 +400,7 @@ def dealDf(conn, addr, localPath):
     return None
 
 
-def dealQf(conn, addr, fid, user, currentUser):
+def dealQf(conn, addr, fid, destUser, currentUser):
     global gloDestUser
     global gloPath
     global gloSrcUser
@@ -408,7 +410,7 @@ def dealQf(conn, addr, fid, user, currentUser):
         cursor.execute("use pandb")
     except:
         print("Error: unable to use database!")
-    sql = "select distinct r.user, r.fpath from deviceinfo as d, resourceinfo as r where r.id = '{}' and r.user = '{}' and r.user = d.user and d.status = 1".format(fid, user)
+    sql = "select distinct r.user, r.fpath from deviceinfo as d, resourceinfo as r where r.id = '{}' and r.user = '{}' and r.user = d.user and d.status = 1".format(fid, destUser)
     cursor.execute(sql)
     res = cursor.fetchone()
     # 需要判断列表是否为空
