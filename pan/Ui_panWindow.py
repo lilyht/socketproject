@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Ui_panWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -40,7 +40,7 @@ class Ui_panWindow(object):
 "")
         self.usernameLine.setObjectName("usernameLine")
         self.searchLine = QtWidgets.QLineEdit(self.centralwidget)
-        self.searchLine.setGeometry(QtCore.QRect(80, 380, 191, 31))
+        self.searchLine.setGeometry(QtCore.QRect(70, 380, 191, 31))
         self.searchLine.setStyleSheet("font: 25 9pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border: 1px solid rgb(135, 135, 135);\n"
@@ -49,7 +49,7 @@ class Ui_panWindow(object):
         self.searchLine.setText("")
         self.searchLine.setObjectName("searchLine")
         self.searchButton = QtWidgets.QPushButton(self.centralwidget)
-        self.searchButton.setGeometry(QtCore.QRect(80, 420, 191, 31))
+        self.searchButton.setGeometry(QtCore.QRect(530, 380, 191, 31))
         self.searchButton.setStyleSheet("font: 10pt \"Microsoft YaHei UI Light\";\n"
 "background-color: rgb(1, 90, 255);\n"
 "color: white;\n"
@@ -60,13 +60,13 @@ class Ui_panWindow(object):
 "")
         self.searchButton.setObjectName("searchButton")
         self.showButton = QtWidgets.QPushButton(self.centralwidget)
-        self.showButton.setGeometry(QtCore.QRect(330, 490, 112, 32))
+        self.showButton.setGeometry(QtCore.QRect(200, 490, 112, 32))
         self.showButton.setObjectName("showButton")
         self.declareButton = QtWidgets.QPushButton(self.centralwidget)
-        self.declareButton.setGeometry(QtCore.QRect(80, 490, 112, 32))
+        self.declareButton.setGeometry(QtCore.QRect(70, 490, 112, 32))
         self.declareButton.setObjectName("declareButton")
         self.queryButton = QtWidgets.QPushButton(self.centralwidget)
-        self.queryButton.setGeometry(QtCore.QRect(440, 420, 191, 31))
+        self.queryButton.setGeometry(QtCore.QRect(530, 425, 191, 31))
         self.queryButton.setStyleSheet("font: 10pt \"Microsoft YaHei UI Light\";\n"
 "background-color: rgb(1, 90, 255);\n"
 "color: white;\n"
@@ -76,7 +76,7 @@ class Ui_panWindow(object):
 "}")
         self.queryButton.setObjectName("queryButton")
         self.queryIdLine = QtWidgets.QLineEdit(self.centralwidget)
-        self.queryIdLine.setGeometry(QtCore.QRect(340, 380, 191, 31))
+        self.queryIdLine.setGeometry(QtCore.QRect(70, 425, 191, 31))
         self.queryIdLine.setStyleSheet("font: 25 9pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border: 1px solid rgb(135, 135, 135);\n"
@@ -85,7 +85,7 @@ class Ui_panWindow(object):
         self.queryIdLine.setText("")
         self.queryIdLine.setObjectName("queryIdLine")
         self.resultTable = QtWidgets.QTableView(self.centralwidget)
-        self.resultTable.setGeometry(QtCore.QRect(70, 120, 641, 231))
+        self.resultTable.setGeometry(QtCore.QRect(70, 120, 661, 231))
         self.resultTable.setObjectName("resultTable")
         self.label_2 = QtWidgets.QLabel(self.centralwidget)
         self.label_2.setGeometry(QtCore.QRect(60, 80, 141, 31))
@@ -101,7 +101,7 @@ class Ui_panWindow(object):
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
         self.queryUserLine = QtWidgets.QLineEdit(self.centralwidget)
-        self.queryUserLine.setGeometry(QtCore.QRect(540, 380, 191, 31))
+        self.queryUserLine.setGeometry(QtCore.QRect(270, 425, 191, 31))
         self.queryUserLine.setStyleSheet("font: 25 9pt \"微软雅黑 Light\";\n"
 "border-style: none;\n"
 "border: 1px solid rgb(135, 135, 135);\n"
@@ -111,7 +111,7 @@ class Ui_panWindow(object):
         self.queryUserLine.setObjectName("queryUserLine")
         panWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(panWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 17))
         self.menubar.setObjectName("menubar")
         panWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(panWindow)
