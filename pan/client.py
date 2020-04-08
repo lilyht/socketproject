@@ -173,7 +173,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     def recvChangePsw(self, newPsw):
         newPswInfo = 'cp' + ' ' + newPsw
         print("接收到新密码：" + newPsw)
-        # self.client.send(newPswInfo.encode("UTF-8"))
+        self.client.send(newPswInfo.encode("UTF-8"))
+        
 
     # 接收网盘界面的资源声明消息
     def recvPanClare(self, localFileInfo):

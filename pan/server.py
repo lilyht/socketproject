@@ -108,6 +108,9 @@ def dealConn(conn, addr):
                     # 客户端传来 "sc" + "资源名"
                     fname = dstr[1]
                     dealSc(conn, addr, user, fname)
+                if cmd == "cp":  # 修改密码
+                    newpsw = dstr[1]
+                    dealCp(conn, addr, user, newpsw)
                 if cmd == "kc":  # 心跳函数
                     # kcInfo = dstr[1]
                     print("保持心跳")
@@ -439,6 +442,23 @@ def dealQf(conn, addr, fid, destUser, currentUser):
 
     return None
 
+def dealCp(conn, addr, user, newpsw):
+    db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
+    cursor = db.cursor()
+    try:
+        cursor.execute("use pandb")
+    except:
+        print("Error: unable to use database!")
+    sql = "Update USER SET password = '{}' where user = '{}'".format(newpsw, user)
+    try:
+        cursor.execute(sql)
+        db.commit()
+        print("修改密码成功")
+        # conn.send("1".encode("UTF-8"))
+    except ValueError as e:
+        print("--->", e)
+        # conn.send("-1".encode("UTF-8"))
+        print("修改密码失败")
 
 def main():
     print("The server in ready to receive.")

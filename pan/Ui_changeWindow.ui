@@ -17,60 +17,113 @@
    <widget class="QWidget" name="gridLayoutWidget">
     <property name="geometry">
      <rect>
-      <x>220</x>
-      <y>50</y>
-      <width>291</width>
-      <height>131</height>
+      <x>190</x>
+      <y>30</y>
+      <width>351</width>
+      <height>181</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
      <item row="1" column="0">
       <widget class="QLabel" name="reenterLabel">
+       <property name="styleSheet">
+        <string notr="true">font: 15pt</string>
+       </property>
        <property name="text">
         <string>再次输入：</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QLineEdit" name="newPswLine"/>
+      <widget class="QLineEdit" name="newPswLine">
+       <property name="styleSheet">
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="newPswLabel">
+       <property name="styleSheet">
+        <string notr="true">font: 15pt</string>
+       </property>
        <property name="text">
         <string>新的密码：</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QLineEdit" name="reenterLine"/>
+      <widget class="QLineEdit" name="reenterLine">
+       <property name="font">
+        <font>
+         <family>微软雅黑 Light</family>
+         <pointsize>12</pointsize>
+         <weight>3</weight>
+         <italic>false</italic>
+         <bold>false</bold>
+         <strikeout>false</strikeout>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">font: 25 12pt &quot;微软雅黑 Light&quot;;
+border-style: none;
+border-bottom: 1px solid rgb(135, 135, 135);
+background-color: rgba(255,255,255,0)
+</string>
+       </property>
+       <property name="echoMode">
+        <enum>QLineEdit::Password</enum>
+       </property>
+      </widget>
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget">
+   <widget class="QPushButton" name="confirmButton">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>200</y>
-      <width>261</width>
-      <height>111</height>
+      <x>190</x>
+      <y>250</y>
+      <width>171</width>
+      <height>41</height>
      </rect>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="confirmButton">
-       <property name="text">
-        <string>确认</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="exitButton">
-       <property name="text">
-        <string>取消</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <property name="styleSheet">
+     <string notr="true">border-style: none;
+background-color: rgb(1, 90, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;</string>
+    </property>
+    <property name="text">
+     <string>确认</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="exitButton">
+    <property name="geometry">
+     <rect>
+      <x>360</x>
+      <y>250</y>
+      <width>181</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-style: none;
+background-color: rgb(53, 148, 255);
+font: 10pt &quot;Microsoft YaHei UI&quot;;
+color: white;
+font-weight: bold;
+</string>
+    </property>
+    <property name="text">
+     <string>取消</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
@@ -79,7 +132,7 @@
      <x>0</x>
      <y>0</y>
      <width>709</width>
-     <height>22</height>
+     <height>17</height>
     </rect>
    </property>
   </widget>
