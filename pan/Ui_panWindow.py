@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'Ui_panWindow.ui'
 #
-# Created by: PyQt5 UI code generator 5.13.0
+# Created by: PyQt5 UI code generator 5.14.1
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -109,9 +109,17 @@ class Ui_panWindow(object):
 "")
         self.queryUserLine.setText("")
         self.queryUserLine.setObjectName("queryUserLine")
+        self.changeButton = QtWidgets.QPushButton(self.centralwidget)
+        self.changeButton.setGeometry(QtCore.QRect(540, 70, 181, 31))
+        self.changeButton.setStyleSheet("font: 10pt \"Microsoft YaHei UI Light\";\n"
+"background-color: rgb(0, 155, 255);\n"
+"color: white;\n"
+"font-weight: bold;\n"
+"")
+        self.changeButton.setObjectName("changeButton")
         panWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(panWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 17))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
         self.menubar.setObjectName("menubar")
         panWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(panWindow)
@@ -135,3 +143,4 @@ class Ui_panWindow(object):
         self.queryIdLine.setPlaceholderText(_translate("panWindow", "请输入文件ID"))
         self.label_2.setText(_translate("panWindow", "当前用户："))
         self.queryUserLine.setPlaceholderText(_translate("panWindow", "请输入持有者用户名"))
+        self.changeButton.setText(_translate("panWindow", "修改密码"))

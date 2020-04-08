@@ -22,6 +22,7 @@ buf = 2048
 global allowHeart
 allowHeart = True
 
+
 def main():
     # 程序的开始，所有的窗口都由登陆界面（w1）衍生
     app = QApplication(sys.argv)
@@ -161,12 +162,18 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.w3.listSignal.connect(self.recvPanShowList)  # 接收到网盘界面的显示文件列表
         self.w3.searchSignal.connect(self.recvPanSearchUser)  # 接收到网盘搜索资源持有者
         self.w3.querySignal.connect(self.recvPanQueryFile)  # 接收到网盘请求获取资源
+        self.w3.changeSignal.connect(self.recvChangePsw)  # 接收到网盘请求修改密码
 
     # 接收注册界面传来的注册名和注册密码
     def recvRegi(self, text1, text2):
         self.regiUser = text1
         self.regiPassword = text2
         self.check2(self.regiUser, self.regiPassword)  # 传给客户端让它发送给服务器检测
+
+    def recvChangePsw(self, newPsw):
+        newPswInfo = 'cp' + ' ' + newPsw
+        print("接收到新密码：" + newPsw)
+        # self.client.send(newPswInfo.encode("UTF-8"))
 
     # 接收网盘界面的资源声明消息
     def recvPanClare(self, localFileInfo):
@@ -284,8 +291,10 @@ class loginWindow(QMainWindow, Ui_loginWindow):
             self.w2.close()
         elif reply == "0":
             regiInfo = QMessageBox.critical(self, "注册反馈", "用户名已存在！")
-        else:
+        elif reply == "-1":
             regiInfo = QMessageBox.critical(self, "注册反馈", "出现未知错误！")
+        else:
+            regiInfo = QMessageBox.critical(self, "注册反馈", "注册请求被拒绝！")
 
     def dealUpload(self, filePath):
         # 上传文件大小

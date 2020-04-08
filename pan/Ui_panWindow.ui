@@ -256,6 +256,26 @@ background-color: rgba(255,255,255,0)
      <string>请输入持有者用户名</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="changeButton">
+    <property name="geometry">
+     <rect>
+      <x>540</x>
+      <y>70</y>
+      <width>181</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">font: 10pt &quot;Microsoft YaHei UI Light&quot;;
+background-color: rgb(0, 155, 255);
+color: white;
+font-weight: bold;
+</string>
+    </property>
+    <property name="text">
+     <string>修改密码</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -263,7 +283,7 @@ background-color: rgba(255,255,255,0)
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>17</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>

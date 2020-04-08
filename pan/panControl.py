@@ -3,6 +3,7 @@ import hashlib
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5 import QtCore, QtGui, QtWidgets
 from noteControl import noteWindow
+from changeControl import changeWindow
 from Ui_panWindow import *
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -15,6 +16,7 @@ class panWindow(QMainWindow, Ui_panWindow):
     listSignal = pyqtSignal(str)  # 显示文件列表信号
     searchSignal = pyqtSignal(str)  # 搜索资源持有者信号
     querySignal = pyqtSignal(str, str)  # 资源请求信号（ID, user）
+    changeSignal = pyqtSignal(str)  # 密码修改
 
     def __init__(self, parent=None):
         super(panWindow, self).__init__(parent)
@@ -22,6 +24,7 @@ class panWindow(QMainWindow, Ui_panWindow):
 
         self.user = ""
         self.nw = noteWindow()  # 备注窗口
+        self.cp = changeWindow()  # 修改密码窗口
         self.fileInfo = ""
 
         # model1
@@ -34,6 +37,7 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.emptyModel = QStandardItemModel()  # 空的
 
         self.nw.noteSignal.connect(self.recvNoteAndSendAll)  # 接收备注文本
+        self.cp.changeSignal.connect(self.recvNewPsw)  # 接收新密码
 
         # 槽函数
         self.exitButton.clicked.connect(self.shutdown)
@@ -41,6 +45,7 @@ class panWindow(QMainWindow, Ui_panWindow):
         self.showButton.clicked.connect(self.showList)
         self.searchButton.clicked.connect(self.searchUserByFilename)
         self.queryButton.clicked.connect(self.queryFile)
+        self.changeButton.clicked.connect(self.changePsw)
 
     # 点击资源声明后打开本地文件夹并获取路径，并经过client发送到服务器插入
     def getLocalFile(self):
@@ -70,6 +75,12 @@ class panWindow(QMainWindow, Ui_panWindow):
             self.fileInfo += "NULL"
 
         self.clareSignal.emit(self.fileInfo)
+
+    def changePsw(self):
+        self.cp.show()
+
+    def recvNewPsw(self, newPsw):
+        self.changeSignal.emit(newPsw)
 
     # 点击显示当前账号文件列表按钮响应
     def showList(self):

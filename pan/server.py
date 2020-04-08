@@ -178,6 +178,7 @@ def dealConn(conn, addr):
 
 
 def dealRegi(conn, addr, username, psw):
+
     # 打开数据库连接
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     # 使用cursor()方法获取操作游标
@@ -200,6 +201,16 @@ def dealRegi(conn, addr, username, psw):
         return None
 
     except:
+        print("收到注册请求，用户名:%s, 密码:%s" % (username, psw))
+        print("允许注册请输入1，拒绝请输入0，默认为允许")
+        a = input("是否允许注册:")
+        print(a)
+        if a == "0":  # 服务器拒绝注册
+            conn.send("-2".encode("UTF-8"))
+
+            print("服务器拒绝了本次注册请求")
+            return None
+
         sql = "INSERT INTO USER (user, password) VALUES (%s, %s)"
         val = (username, psw)
         try:
