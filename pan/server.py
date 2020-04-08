@@ -442,6 +442,7 @@ def dealQf(conn, addr, fid, destUser, currentUser):
 
     return None
 
+
 def dealCp(conn, addr, user, newpsw):
     db = MySQLdb.connect("localhost", "root", "", "pandb", charset='utf8')
     cursor = db.cursor()
@@ -455,10 +456,13 @@ def dealCp(conn, addr, user, newpsw):
         db.commit()
         print("修改密码成功")
         # conn.send("1".encode("UTF-8"))
+        conn.send("feedbackCp&&&1".encode("UTF-8"))
     except ValueError as e:
         print("--->", e)
         # conn.send("-1".encode("UTF-8"))
+        conn.send("feedbackCp&&&-1".encode("UTF-8"))
         print("修改密码失败")
+
 
 def main():
     print("The server in ready to receive.")

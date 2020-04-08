@@ -158,6 +158,13 @@ class panWindow(QMainWindow, Ui_panWindow):
         else:
             error = QMessageBox.critical(self, "资源声明反馈", "出现未知错误，声明失败！")
 
+    # 接收资源反馈
+    def getFeedbackCp(self, feedback):
+        if feedback == "1":
+            okInfo = QMessageBox.information(self, "密码修改反馈", "修改成功！")
+        else:
+            error = QMessageBox.critical(self, "密码修改反馈", "出现未知错误，修改失败！")
+
     def shutdown(self):
         self.exitSignal.emit("-9")
         self.close()

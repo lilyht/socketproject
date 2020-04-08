@@ -36,6 +36,7 @@ class loginWindow(QMainWindow, Ui_loginWindow):
     fileInfoSignal = pyqtSignal(list)  # 回传我的文件信息
     userInfoSignal = pyqtSignal(list)  # 回传user信息
     feedbackClSignal = pyqtSignal(str)  # 资源声明消息反馈
+    feedbackCpSignal = pyqtSignal(str) # 修改密码反馈
 
     def __init__(self, parent=None):
         super(loginWindow, self).__init__(parent)
@@ -74,6 +75,8 @@ class loginWindow(QMainWindow, Ui_loginWindow):
         self.exitButton.clicked.connect(self.recvExit)
         # 资源声明消息反馈信号
         self.feedbackClSignal.connect(self.w3.getFeedbackCl)
+        # 修改密码反馈信号
+        self.feedbackCpSignal.connect(self.w3.getFeedbackCp)
 
     def dealConn(self):
         global allowHeart
@@ -90,6 +93,9 @@ class loginWindow(QMainWindow, Ui_loginWindow):
                     if cmd == "feedbackCl":  # 接收到服务器发来的资源声明反馈
                         feedback = dstr[1]
                         self.feedbackClSignal.emit(feedback)
+                    if cmd == "feedbackCp":  # 接收到服务器发来的修改密码反馈
+                        feedback = dstr[1]
+                        self.feedbackCpSignal.emit(feedback)
                     if cmd == "fl":  # 文件列表
                         fileList = dstr[1]
                         self.dealFileList(fileList)
